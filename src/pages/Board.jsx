@@ -1,36 +1,96 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../supabaseClient'
 import Navbar from '../components/Navbar'
+import { useAuth } from '../hooks/useAuth'
+import { useBoards } from '../hooks/useBoards'
+import Input from '../components/Input'
+import Button from '../components/Button'
 
 export default function Board() {
-  const [user, setUser] = useState(null)
+  const { user } = useAuth()
+  const { boards, isLoading, fetchBoards, createBoard } = useBoards()
+  
+  // Estado local para el input de crear
+  const [newBoardTitle, setNewBoardTitle] = useState('')
+  const [isCreating, setIsCreating] = useState(false)
 
+  // Cargar tableros al entrar
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-    }
-    getUser()
+    fetchBoards()
   }, [])
 
-  if (!user) return <div className="text-center mt-10 text-gray-500">Cargando...</div>
+  const handleCreateBoard = async (e) => {
+    e.preventDefault()
+    if (!newBoardTitle.trim()) return
+
+    setIsCreating(true)
+    // Por defecto creamos con color azul, luego haremos selector de color
+    await createBoard(newBoardTitle, 'bg-blue-600') 
+    setNewBoardTitle('')
+    setIsCreating(false)
+  }
 
   return (
     <div className="min-h-screen bg-[#1D2125]">
       <Navbar user={user} />
-
-      <main className="p-8">
-        <h2 className="text-white font-bold text-lg mb-4">Mis Tableros</h2>
+      
+      <main className="p-8 max-w-7xl mx-auto">
         
-        {/* Aquí irá el Grid de tableros  */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Título Sección */}
+        <div className="flex items-center gap-2 text-gray-400 font-bold mb-4 uppercase text-sm tracking-wider">
+          <span className="text-xl">📋</span> Tus Tableros
+        </div>
+
+        {/* Grid Principal */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           
-          {/* Botón temporal para crear tablero */}
-          <div className="h-24 bg-[#22272B] hover:bg-[#2c333a] rounded transition cursor-pointer flex items-center justify-center text-gray-400 text-sm">
-             Crear tablero nuevo
+          {/* TARJETA 1: Crear Nuevo Tablero (Siempre visible al inicio) */}
+          <div className="h-28 bg-[#22272B] rounded-lg p-3 flex flex-col justify-between transition border border-transparent hover:border-blue-500">
+             <form onSubmit={handleCreateBoard} className="h-full flex flex-col justify-between">
+                <h3 className="text-sm font-medium text-gray-300">Crear tablero nuevo</h3>
+                <div className="space-y-2">
+                    <input 
+                        className="w-full bg-transparent text-white text-sm border-b border-gray-600 focus:border-blue-500 focus:outline-none placeholder-gray-600 pb-1"
+                        placeholder="Título del tablero..."
+                        value={newBoardTitle}
+                        onChange={(e) => setNewBoardTitle(e.target.value)}
+                    />
+                    <div className="flex justify-end">
+                        <button 
+                            type="submit" 
+                            disabled={isCreating || !newBoardTitle}
+                            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded disabled:opacity-50"
+                        >
+                            {isCreating ? '...' : 'Crear'}
+                        </button>
+                    </div>
+                </div>
+             </form>
           </div>
 
+          {/* LISTA DE TABLEROS EXISTENTES */}
+          {boards.map((board) => (
+            <div 
+                key={board.id} 
+                className={`h-28 rounded-lg p-4 cursor-pointer hover:opacity-90 transition shadow-lg relative group flex items-start justify-between ${board.background.startsWith('#') ? '' : board.background}`}
+                style={board.background.startsWith('#') ? { backgroundColor: board.background } : {}}
+            >
+                <h3 className="font-bold text-white text-lg truncate shadow-black drop-shadow-md">
+                    {board.title}
+                </h3>
+                
+                {/* Indicador visual si es compartido (opcional futuro) */}
+                {board.owner_id !== user.id && (
+                     <span title="Compartido contigo" className="bg-black/30 text-xs text-white px-1 rounded">👥</span>
+                )}
+            </div>
+          ))}
+
         </div>
+        
+        {/* Mensaje si está cargando */}
+        {isLoading && boards.length === 0 && (
+            <p className="mt-8 text-center text-gray-500">Cargando tus espacios...</p>
+        )}
       </main>
     </div>
   )
