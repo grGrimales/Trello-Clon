@@ -7,6 +7,7 @@ import { useAuthStore } from './store/authStore'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Board from './pages/Board'
+import BoardPage from './pages/BoardPage'
 
 function App() {
   const { session, loading, setSession } = useAuthStore()
@@ -40,6 +41,11 @@ function App() {
           <Route 
             path="/" 
             element={session ? <Board /> : <Navigate to="/login" />} 
+          />
+
+          <Route 
+            path="/board/:boardId" 
+            element={session ? <BoardPage /> : <Navigate to="/login" />} 
           />
         </Routes>
       </div>

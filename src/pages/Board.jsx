@@ -4,11 +4,12 @@ import { useAuth } from '../hooks/useAuth'
 import { useBoards } from '../hooks/useBoards'
 import Input from '../components/Input'
 import Button from '../components/Button'
+import { useNavigate } from 'react-router-dom'
 
 export default function Board() {
   const { user } = useAuth()
   const { boards, isLoading, fetchBoards, createBoard } = useBoards()
-  
+  const navigate = useNavigate()
   // Estado local para el input de crear
   const [newBoardTitle, setNewBoardTitle] = useState('')
   const [isCreating, setIsCreating] = useState(false)
@@ -71,6 +72,7 @@ export default function Board() {
           {boards.map((board) => (
             <div 
                 key={board.id} 
+                onClick={() => navigate(`/board/${board.id}`)}
                 className={`h-28 rounded-lg p-4 cursor-pointer hover:opacity-90 transition shadow-lg relative group flex items-start justify-between ${board.background.startsWith('#') ? '' : board.background}`}
                 style={board.background.startsWith('#') ? { backgroundColor: board.background } : {}}
             >
