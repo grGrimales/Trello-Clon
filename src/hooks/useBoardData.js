@@ -12,7 +12,8 @@ export function useBoardData(boardId) {
     setBoardData, 
     setError, 
     addListToState, 
-    reset 
+    reset,
+    addCardToState
   } = useActiveBoardStore()
 
   // 1. Fetch Data (Con Promise.all)
@@ -65,6 +66,44 @@ export function useBoardData(boardId) {
     return false
   }
 
+  const createCard = async (listId, title) => {
+    const currentList = lists.find(l => l.id === listId)
+    const newPosition = currentList?.cards?.length || 0
+
+    const { data, error } = await supabase
+      .from('cards')
+      .insert([{ 
+        title, 
+        list_id: listId, 
+        position: newPosition 
+      }])
+      .select()
+
+    if (data) {
+      addCardToState(listId, data[0])
+      return true
+    }
+    return false
+  }
+
+  const saveCardOrder = async (listId, newCards) => {
+    const updates = newCards.map((card, index) => ({
+      id: card.id,
+      title: card.title,        
+      list_id: listId,          
+      position: index,         
+    }))
+
+    const { error } = await supabase
+      .from('cards')
+      .upsert(updates) 
+
+    if (error) {
+      console.error("Error guardando orden:", error)
+      // TODO toast de error
+    }
+  }
+
   useEffect(() => {
     fetchAllData()
     
@@ -76,6 +115,8 @@ export function useBoardData(boardId) {
     lists, 
     loading, 
     error, 
-    createList 
+    createList,
+    createCard,
+    saveCardOrder
   }
 }

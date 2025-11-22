@@ -1,15 +1,20 @@
-import { useState, useEffect } from 'react' // useEffect solo si necesitamos redirigir
+import { useState, useEffect } from 'react' 
 import { useParams, useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { useAuth } from '../hooks/useAuth'
 import { useBoardData } from '../hooks/useBoardData'
+import List from '../components/List'
+import { DragDropContext } from '@hello-pangea/dnd' 
+import { useActiveBoardStore } from '../store/activeBoardStore'
+
 
 export default function BoardPage() {
   const { boardId } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
   
-  const { board, lists, loading, error, createList } = useBoardData(boardId)
+  const { board, lists, loading, error, createList, createCard, saveCardOrder } = useBoardData(boardId)
+  const moveCard = useActiveBoardStore(state => state.moveCard)
 
   const [isAddingList, setIsAddingList] = useState(false)
   const [newListTitle, setNewListTitle] = useState('')
@@ -29,10 +34,44 @@ export default function BoardPage() {
     }
   }
 
+ // FUNCIÓN QUE SE EJECUTA AL SOLTAR UNA TARJETA
+ const onDragEnd = async (result) => {
+    const { destination, source } = result;
+
+    // 1. Validaciones básicas
+    if (!destination) return;
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) return;
+
+    moveCard(result);
+
+    // 3. PERSISTENCIA (Guardar en BD)
+    // Leemos el estado actualizado directamente del Store para tener la "foto" final
+    const currentLists = useActiveBoardStore.getState().lists;
+    
+    // Buscamos la lista donde cayó la tarjeta (Destino)
+    const destList = currentLists.find(l => l.id.toString() === destination.droppableId);
+    
+    if (destList) {
+      await saveCardOrder(destList.id, destList.cards);
+      
+    
+      if (source.droppableId !== destination.droppableId) {
+         const sourceList = currentLists.find(l => l.id.toString() === source.droppableId);
+         if (sourceList) {
+            await saveCardOrder(sourceList.id, sourceList.cards);
+         }
+      }
+    }
+  }
+
   if (loading) return <div className="h-screen bg-[#1D2125] text-white p-10">Cargando...</div>
   if (!board) return null
 
   return (
+    <DragDropContext onDragEnd={onDragEnd}>
     <div 
       className="h-screen flex flex-col"
       style={{ backgroundColor: board.background.startsWith('#') ? board.background : undefined }} 
@@ -52,22 +91,11 @@ export default function BoardPage() {
             
             {/* Listas */}
             {lists.map((list) => (
-              <div key={list.id} className="w-72 shrink-0 bg-[#101204] rounded-xl p-3 text-gray-300 h-fit max-h-full flex flex-col shadow-md border border-gray-800">
-                  <div className="font-bold text-sm mb-2 px-2 flex justify-between items-center">
-                    {list.title}
-                    <span className="cursor-pointer hover:text-white">...</span>
-                  </div>
-                  <div className="space-y-2 overflow-y-auto pr-1 custom-scrollbar">
-                     {list.cards && list.cards.map(card => (
-                       <div key={card.id} className="bg-[#22272B] p-2 rounded shadow-sm text-sm hover:ring-2 hover:ring-blue-500 cursor-pointer text-white">
-                         {card.title}
-                       </div>
-                     ))}
-                  </div>
-                  <button className="mt-2 text-left text-sm text-gray-400 hover:bg-[#22272B] p-2 rounded transition hover:text-white">
-                    + Añadir tarjeta
-                  </button>
-              </div>
+              <List 
+                key={list.id} 
+                list={list} 
+                createCard={createCard} 
+              />
             ))}
 
             {/* Formulario de Nueva Lista */}
@@ -108,5 +136,6 @@ export default function BoardPage() {
         </div>
       </div>
     </div>
+    </DragDropContext>
   )
 }
