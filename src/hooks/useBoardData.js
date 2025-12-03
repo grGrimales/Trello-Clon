@@ -13,7 +13,8 @@ export function useBoardData(boardId) {
     setError, 
     addListToState, 
     reset,
-    addCardToState
+    addCardToState,
+    deleteCardFromState
   } = useActiveBoardStore()
 
   // 1. Fetch Data (Con Promise.all)
@@ -104,6 +105,21 @@ export function useBoardData(boardId) {
     }
   }
 
+
+  const deleteCard = async (listId, cardId) => {
+    deleteCardFromState(listId, cardId)
+
+    const { error } = await supabase
+      .from('cards')
+      .delete()
+      .eq('id', cardId)
+
+    if (error) {
+      console.error("Error borrando tarjeta:", error)
+      alert("Hubo un error borrando la tarjeta")
+    }
+  }
+
   useEffect(() => {
     fetchAllData()
     
@@ -117,6 +133,7 @@ export function useBoardData(boardId) {
     error, 
     createList,
     createCard,
-    saveCardOrder
+    saveCardOrder,
+    deleteCard
   }
 }

@@ -29,6 +29,14 @@ export const useActiveBoardStore = create((set, get) => ({
     )
   })),
 
+
+  deleteCardFromState: (listId, cardId) => set((state) => ({
+    lists: state.lists.map((list) => 
+      list.id === listId
+        ? { ...list, cards: list.cards.filter(c => c.id !== cardId) } 
+        : list
+    )
+  })),
   
   moveCard: (result) => set((state) => {
     const { source, destination } = result;

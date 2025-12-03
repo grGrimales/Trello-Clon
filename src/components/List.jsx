@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Droppable } from '@hello-pangea/dnd' 
 import Card from './Card' 
 
-export default function List({ list, createCard }) {
+export default function List({ list, createCard, deleteCard }) {
   const [isEditing, setIsEditing] = useState(false)
   const [cardTitle, setCardTitle] = useState('')
 
@@ -31,7 +31,7 @@ export default function List({ list, createCard }) {
             className="space-y-2 overflow-y-auto pr-1 custom-scrollbar min-h-[10px]"
           >
             {list.cards && list.cards.map((card, index) => (
-              <Card key={card.id} card={card} index={index} />
+              <Card key={card.id} card={card} index={index} listId={list.id} deleteCard={deleteCard} />
             ))}
             {provided.placeholder} {/* Espacio fantasma al arrastrar */}
           </div>

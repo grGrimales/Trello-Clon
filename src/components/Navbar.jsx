@@ -20,6 +20,7 @@ const navigate = useNavigate()
   const initials = getInitials(userName)
 
   return (
+    //Poder redirigir a la pagina principal al dar click en el logo
     <nav className="flex items-center justify-between px-4 py-2 bg-[#1D2125] border-b border-gray-700">
       
       <div className="flex items-center gap-4">
