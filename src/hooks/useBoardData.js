@@ -14,7 +14,8 @@ export function useBoardData(boardId) {
     addListToState, 
     reset,
     addCardToState,
-    deleteCardFromState
+    deleteCardFromState,
+    updateCardInState
   } = useActiveBoardStore()
 
   // 1. Fetch Data (Con Promise.all)
@@ -126,6 +127,19 @@ export function useBoardData(boardId) {
     return () => reset() 
   }, [boardId])
 
+
+const updateCard = async (listId, cardId, newTitle) => {
+    updateCardInState(listId, cardId, newTitle)
+
+    const { error } = await supabase
+      .from('cards')
+      .update({ title: newTitle })
+      .eq('id', cardId)
+
+    if (error) {
+      console.error("Error actualizando tarjeta:", error)
+    }
+  }
   return { 
     board, 
     lists, 
@@ -134,6 +148,7 @@ export function useBoardData(boardId) {
     createList,
     createCard,
     saveCardOrder,
-    deleteCard
+    deleteCard,
+    updateCard
   }
 }
