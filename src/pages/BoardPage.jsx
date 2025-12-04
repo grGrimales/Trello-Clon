@@ -6,6 +6,7 @@ import { useBoardData } from '../hooks/useBoardData'
 import List from '../components/List'
 import { DragDropContext } from '@hello-pangea/dnd' 
 import { useActiveBoardStore } from '../store/activeBoardStore'
+import { useDraggableScroll } from '../hooks/useDraggableScroll'
 
 
 export default function BoardPage() {
@@ -15,6 +16,9 @@ export default function BoardPage() {
   
   const { board, lists, loading, error, createList, createCard, saveCardOrder, deleteCard, updateCard } = useBoardData(boardId)
   const moveCard = useActiveBoardStore(state => state.moveCard)
+  
+
+  const { ref: scrollRef, events: scrollEvents } = useDraggableScroll()
 
   const [isAddingList, setIsAddingList] = useState(false)
   const [newListTitle, setNewListTitle] = useState('')
@@ -86,7 +90,10 @@ export default function BoardPage() {
           </h1>
         </div>
 
-        <div className="flex-1 overflow-x-auto overflow-y-hidden p-4">
+        <div // Conectamos la REF del hook
+          ref={scrollRef}
+          // Conectamos los EVENTOS del hook (MouseDown, Move, etc.)
+          {...scrollEvents} className="flex-1 overflow-x-auto overflow-y-hidden p-4 cursor-grab select-none scrollbar-hide">
           <div className="flex h-full gap-4">
             
             {/* Listas */}
