@@ -79,7 +79,14 @@ export const useActiveBoardStore = create((set, get) => ({
     return { lists: newLists }
   }),
 
-  reset: () => set({ board: null, lists: [], loading: false, error: null })
+  reset: () => set({ board: null, lists: [], loading: false, error: null }),
+
+
+  updateListTitleInState: (listId, newTitle) => set((state) => ({
+    lists: state.lists.map((list) => 
+      list.id === listId ? { ...list, title: newTitle } : list
+    )
+  })),
 
   
 }))

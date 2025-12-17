@@ -13,7 +13,20 @@ export default function BoardPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
   
-  const { board, lists, loading, error, createList, createCard, saveCardOrder, deleteCard, updateCard, saveListOrder } = useBoardData(boardId)
+  const { 
+    board,
+    lists,
+    loading,
+    error,
+    createList,
+    createCard,
+    saveCardOrder,
+    deleteCard,
+    updateCard, 
+    saveListOrder,
+    updateListTitle } = 
+    useBoardData(boardId)
+
   const moveList = useActiveBoardStore(state => state.moveList) 
   const moveCard = useActiveBoardStore(state => state.moveCard)
   
@@ -110,6 +123,7 @@ export default function BoardPage() {
                     createCard={createCard} 
                     deleteCard={deleteCard}
                     updateCard={updateCard}
+                    updateListTitle={updateListTitle}
                   />
                 ))}
                 

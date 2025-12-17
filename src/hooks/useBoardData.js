@@ -16,7 +16,8 @@ export function useBoardData(boardId) {
     addCardToState,
     deleteCardFromState,
     updateCardInState,
-    moveList
+    moveList,
+    updateListTitleInState
   } = useActiveBoardStore()
 
   const fetchAllData = async () => {
@@ -152,6 +153,21 @@ const updateCard = async (listId, cardId, newTitle) => {
 
     if (error) console.error("Error guardando orden de listas:", error)
   }
+
+  const updateListTitle = async (listId, newTitle) => {
+    updateListTitleInState(listId, newTitle)
+
+    const { error } = await supabase
+      .from('lists')
+      .update({ title: newTitle })
+      .eq('id', listId)
+
+    if (error) {
+      console.error("Error al actualizar lista:", error)
+    }
+  }
+
+
   return { 
     board, 
     lists, 
@@ -162,6 +178,7 @@ const updateCard = async (listId, cardId, newTitle) => {
     saveCardOrder,
     deleteCard,
     updateCard,
-    saveListOrder
+    saveListOrder,
+    updateListTitle,
   }
 }
