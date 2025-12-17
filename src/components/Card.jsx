@@ -124,7 +124,7 @@ export default function Card({ card, index, listId, deleteCard, updateCard }) {
 
   // --- MODO NORMAL---
   return (
-    <Draggable draggableId={card.id.toString()} index={index}>
+   <Draggable draggableId={`card-${card.id}`} index={index}>
       {(provided, snapshot) => (
         <div
           ref={(node) => {

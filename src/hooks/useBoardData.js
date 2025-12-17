@@ -15,10 +15,10 @@ export function useBoardData(boardId) {
     reset,
     addCardToState,
     deleteCardFromState,
-    updateCardInState
+    updateCardInState,
+    moveList
   } = useActiveBoardStore()
 
-  // 1. Fetch Data (Con Promise.all)
   const fetchAllData = async () => {
     if (!boardId) return
     setLoading(true)
@@ -36,13 +36,11 @@ export function useBoardData(boardId) {
       if (boardRes.error) throw boardRes.error
       if (listsRes.error) throw listsRes.error
 
-      // Ordenar tarjetas
       const sortedLists = listsRes.data.map(list => ({
         ...list,
         cards: list.cards?.sort((a, b) => a.position - b.position) || []
       }))
 
-      // Guardar en Zustand
       setBoardData(boardRes.data, sortedLists)
 
     } catch (err) {
@@ -51,7 +49,6 @@ export function useBoardData(boardId) {
     }
   }
 
-  // 2. Crear Lista
   const createList = async (title) => {
     const newPosition = lists.length > 0 ? lists.length + 1 : 0
     
@@ -140,6 +137,21 @@ const updateCard = async (listId, cardId, newTitle) => {
       console.error("Error actualizando tarjeta:", error)
     }
   }
+
+  const saveListOrder = async (newLists) => {
+    const updates = newLists.map((list, index) => ({
+      id: list.id,
+      board_id: boardId,
+      title: list.title,
+      position: index
+    }))
+
+    const { error } = await supabase
+      .from('lists')
+      .upsert(updates)
+
+    if (error) console.error("Error guardando orden de listas:", error)
+  }
   return { 
     board, 
     lists, 
@@ -149,6 +161,7 @@ const updateCard = async (listId, cardId, newTitle) => {
     createCard,
     saveCardOrder,
     deleteCard,
-    updateCard
+    updateCard,
+    saveListOrder
   }
 }

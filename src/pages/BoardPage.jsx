@@ -4,20 +4,19 @@ import Navbar from '../components/Navbar'
 import { useAuth } from '../hooks/useAuth'
 import { useBoardData } from '../hooks/useBoardData'
 import List from '../components/List'
-import { DragDropContext } from '@hello-pangea/dnd' 
+import { DragDropContext, Droppable } from '@hello-pangea/dnd' 
 import { useActiveBoardStore } from '../store/activeBoardStore'
 import { useDraggableScroll } from '../hooks/useDraggableScroll'
-
 
 export default function BoardPage() {
   const { boardId } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
   
-  const { board, lists, loading, error, createList, createCard, saveCardOrder, deleteCard, updateCard } = useBoardData(boardId)
+  const { board, lists, loading, error, createList, createCard, saveCardOrder, deleteCard, updateCard, saveListOrder } = useBoardData(boardId)
+  const moveList = useActiveBoardStore(state => state.moveList) 
   const moveCard = useActiveBoardStore(state => state.moveCard)
   
-
   const { ref: scrollRef, events: scrollEvents } = useDraggableScroll()
 
   const [isAddingList, setIsAddingList] = useState(false)
@@ -38,30 +37,26 @@ export default function BoardPage() {
     }
   }
 
- // FUNCIÓN QUE SE EJECUTA AL SOLTAR UNA TARJETA
- const onDragEnd = async (result) => {
-    const { destination, source } = result;
+  const onDragEnd = async (result) => {
+    const { destination, source, type } = result; 
 
-    // 1. Validaciones básicas
     if (!destination) return;
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    ) return;
+    if (destination.droppableId === source.droppableId && destination.index === source.index) return;
+
+    if (type === 'LIST') {
+      moveList(source.index, destination.index)
+      const newLists = useActiveBoardStore.getState().lists
+      await saveListOrder(newLists)
+      return; 
+    }
 
     moveCard(result);
-
-    // 3. PERSISTENCIA (Guardar en BD)
-    // Leemos el estado actualizado directamente del Store para tener la "foto" final
-    const currentLists = useActiveBoardStore.getState().lists;
     
-    // Buscamos la lista donde cayó la tarjeta (Destino)
+    const currentLists = useActiveBoardStore.getState().lists;
     const destList = currentLists.find(l => l.id.toString() === destination.droppableId);
     
     if (destList) {
       await saveCardOrder(destList.id, destList.cards);
-      
-    
       if (source.droppableId !== destination.droppableId) {
          const sourceList = currentLists.find(l => l.id.toString() === source.droppableId);
          if (sourceList) {
@@ -90,58 +85,73 @@ export default function BoardPage() {
           </h1>
         </div>
 
-        <div // Conectamos la REF del hook
+        {/* ZONA DE SCROLL */}
+        <div 
           ref={scrollRef}
-          // Conectamos los EVENTOS del hook (MouseDown, Move, etc.)
-          {...scrollEvents} className="flex-1 overflow-x-auto overflow-y-hidden p-4 cursor-grab select-none scrollbar-hide">
-          <div className="flex h-full gap-4">
-            
-            {/* Listas */}
-            {lists.map((list) => (
-              <List 
-                key={list.id} 
-                list={list} 
-                createCard={createCard} 
-                deleteCard={deleteCard}
-                updateCard={updateCard}
-              />
-            ))}
-
-            {/* Formulario de Nueva Lista */}
-            <div className="w-72 shrink-0">
-              {!isAddingList ? (
-                <button 
-                  onClick={() => setIsAddingList(true)}
-                  className="w-full h-12 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold flex items-center px-4 transition text-left backdrop-blur-sm"
-                >
-                  + Añadir otra lista
-                </button>
-              ) : (
-                <form onSubmit={handleSubmitList} className="bg-[#101204] rounded-xl p-3 border border-gray-700">
-                  <input 
-                    autoFocus
-                    className="w-full bg-[#22272B] text-white text-sm p-2 rounded border border-blue-500 outline-none mb-2"
-                    placeholder="Introduzca el título..."
-                    value={newListTitle}
-                    onChange={(e) => setNewListTitle(e.target.value)}
+          {...scrollEvents} 
+          className="flex-1 overflow-x-auto overflow-y-hidden p-4 cursor-grab select-none scrollbar-hide"
+        >
+          
+          {/* 2. AGREGAMOS EL DROPPABLE HORIZONTAL PARA LAS LISTAS AQUÍ */}
+          <Droppable droppableId="all-lists" direction="horizontal" type="LIST">
+            {(provided) => (
+              <div 
+                className="flex h-full gap-4"
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                
+                {/* Listas */}
+                {lists.map((list, index) => (
+                  <List 
+                    key={list.id} 
+                    list={list}
+                    index={index} 
+                    createCard={createCard} 
+                    deleteCard={deleteCard}
+                    updateCard={updateCard}
                   />
-                  <div className="flex items-center gap-2">
-                    <button type="submit" className="bg-blue-600 text-white text-sm px-3 py-1.5 rounded hover:bg-blue-700">
-                      Añadir lista
-                    </button>
-                    <button 
-                      type="button"
-                      onClick={() => setIsAddingList(false)} 
-                      className="text-gray-400 hover:text-white px-2"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </form>
-              )}
-            </div>
+                ))}
+                
+                {provided.placeholder}
 
-          </div>
+                <div className="w-72 shrink-0">
+                  {!isAddingList ? (
+                    <button 
+                      onClick={() => setIsAddingList(true)}
+                      className="w-full h-12 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold flex items-center px-4 transition text-left backdrop-blur-sm"
+                    >
+                      + Añadir otra lista
+                    </button>
+                  ) : (
+                    <form onSubmit={handleSubmitList} className="bg-[#101204] rounded-xl p-3 border border-gray-700">
+                      <input 
+                        autoFocus
+                        className="w-full bg-[#22272B] text-white text-sm p-2 rounded border border-blue-500 outline-none mb-2"
+                        placeholder="Introduzca el título..."
+                        value={newListTitle}
+                        onChange={(e) => setNewListTitle(e.target.value)}
+                      />
+                      <div className="flex items-center gap-2">
+                        <button type="submit" className="bg-blue-600 text-white text-sm px-3 py-1.5 rounded hover:bg-blue-700">
+                          Añadir lista
+                        </button>
+                        <button 
+                          type="button"
+                          onClick={() => setIsAddingList(false)} 
+                          className="text-gray-400 hover:text-white px-2"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+
+              </div>
+            )}
+          </Droppable>
+
         </div>
       </div>
     </div>

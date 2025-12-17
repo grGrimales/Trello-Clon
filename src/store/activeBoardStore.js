@@ -41,26 +41,21 @@ export const useActiveBoardStore = create((set, get) => ({
   moveCard: (result) => set((state) => {
     const { source, destination } = result;
 
-    // Si no hay destino (la soltaron fuera), no hacemos nada
     if (!destination) return state;
 
     const newLists = state.lists.map(list => ({
       ...list,
       cards: [...list.cards] 
     }));
-    // 1. Encontrar lista de origen y destino
     const sourceList = newLists.find(list => list.id.toString() === source.droppableId);
     const destList = newLists.find(list => list.id.toString() === destination.droppableId);
 
     if (!sourceList || !destList) return state;
 
-    // 2. Sacar la tarjeta de la lista de origen
     const [movedCard] = sourceList.cards.splice(source.index, 1);
 
-    // 3. Ponerla en la lista de destino en la nueva posición
     destList.cards.splice(destination.index, 0, movedCard);
 
-    // TODO: Aquí  llamaremos a Supabase para guardar el cambio de posición
 
     return { lists: newLists };
   }),
@@ -76,6 +71,14 @@ export const useActiveBoardStore = create((set, get) => ({
     )
   })),
   
+  moveList: (fromIndex, toIndex) => set((state) => {
+    const newLists = [...state.lists] 
+    const [movedList] = newLists.splice(fromIndex, 1) 
+    newLists.splice(toIndex, 0, movedList) 
+    
+    return { lists: newLists }
+  }),
+
   reset: () => set({ board: null, lists: [], loading: false, error: null })
 
   
