@@ -8,6 +8,7 @@ import { DragDropContext, Droppable } from '@hello-pangea/dnd'
 import { useActiveBoardStore } from '../store/activeBoardStore'
 import { useDraggableScroll } from '../hooks/useDraggableScroll'
 import CardModal from '../components/CardModal'
+import ShareModal from '../components/ShareModal'
 
 export default function BoardPage() {
   const { boardId } = useParams()
@@ -28,7 +29,9 @@ export default function BoardPage() {
     updateCardDescription,
     updateListTitle,
     addComment,
-    logActivity
+    logActivity,
+    inviteUser,
+    getCurrentUser
   } = 
     useBoardData(boardId)
 
@@ -37,14 +40,26 @@ export default function BoardPage() {
   
   const { ref: scrollRef, events: scrollEvents } = useDraggableScroll()
 
-  const [isAddingList, setIsAddingList] = useState(false)
-  const [newListTitle, setNewListTitle] = useState('')
+  const [isAddingList, setIsAddingList] = useState(false);
+  const [newListTitle, setNewListTitle] = useState('');
 
-  const [selectedCard, setSelectedCard] = useState(null)
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     if (error) navigate('/')
   }, [error, navigate])
+
+ useEffect(() => {
+    const fetchUser = async () => {
+      if (getCurrentUser) { 
+         const user = await getCurrentUser()
+         setCurrentUser(user)
+      }
+    }
+    fetchUser()
+  }, [getCurrentUser])
 
   const handleSubmitList = async (e) => {
     e.preventDefault()
@@ -104,6 +119,14 @@ export default function BoardPage() {
     ? lists.find(l => l.id === selectedCard.list_id)?.cards.find(c => c.id === selectedCard.id)
     : null
 
+
+    const handleShare = async () => {
+      const email = window.prompt("Escribe el email del usuario a invitar al tablero:")
+      if (!email) return // Si cancela, no hacemos nada
+
+      const result = await inviteUser(email.trim().toLowerCase())
+      alert(result.message)
+    }
   return (
     <DragDropContext onDragEnd={onDragEnd}>
     <div 
@@ -118,6 +141,14 @@ export default function BoardPage() {
           <h1 className="font-bold text-lg px-3 py-1 rounded hover:bg-white/20 cursor-pointer transition">
             {board.title}
           </h1>
+
+         <button 
+      onClick={() => setIsShareModalOpen(true)}
+      className="bg-[#DFE1E6] hover:bg-[#C1C7D0] text-[#172B4D] text-sm font-medium px-3 py-[6px] rounded-[3px] flex items-center gap-2 transition-colors"
+    >
+       <span className="text-lg leading-none">👤+</span>
+       <span>Compartir</span>
+    </button>
         </div>
 
         {/* ZONA DE SCROLL */}
@@ -126,8 +157,7 @@ export default function BoardPage() {
           {...scrollEvents} 
           className="flex-1 overflow-x-auto overflow-y-hidden p-4 cursor-grab select-none scrollbar-hide"
         >
-          
-          {/* 2. AGREGAMOS EL DROPPABLE HORIZONTAL PARA LAS LISTAS AQUÍ */}
+
           <Droppable droppableId="all-lists" direction="horizontal" type="LIST">
             {(provided) => (
               <div 
@@ -205,6 +235,15 @@ export default function BoardPage() {
         />
       )}
       </div>
+
+      {isShareModalOpen && board && (
+       <ShareModal 
+          board={board}
+          currentUser={currentUser}
+          onClose={() => setIsShareModalOpen(false)}
+          onInvite={inviteUser}
+        />
+      )}
     </div>
     </DragDropContext>
   )

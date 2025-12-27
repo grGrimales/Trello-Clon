@@ -3,15 +3,15 @@ import { supabase } from '../supabaseClient'
 import { useActiveBoardStore } from '../store/activeBoardStore'
 
 export function useBoardData(boardId) {
-  const { 
-    board, 
-    lists, 
-    loading, 
-    error, 
-    setLoading, 
-    setBoardData, 
-    setError, 
-    addListToState, 
+  const {
+    board,
+    lists,
+    loading,
+    error,
+    setLoading,
+    setBoardData,
+    setError,
+    addListToState,
     reset,
     addCardToState,
     deleteCardFromState,
@@ -23,38 +23,37 @@ export function useBoardData(boardId) {
     addActivityToState
   } = useActiveBoardStore()
 
- const fetchAllData = async () => {
+  const fetchAllData = async () => {
     if (!boardId) return
     setLoading(true)
 
     try {
-      const [boardRes, listsRes] = await Promise.all([
+      const [boardRes, listsRes, userRes] = await Promise.all([
         supabase.from('boards').select('*').eq('id', boardId).single(),
         supabase
           .from('lists')
-          .select(`
-            *,
-            cards (
-              *,
-              comments (*),
-              activities (*)
-            )
-          `)
+          .select(`*, cards (*, comments (*), activities (*))`)
           .eq('board_id', boardId)
           .order('position', { ascending: true })
-          .order('created_at', { foreignTable: 'cards.activities', ascending: false })
+          .order('created_at', { foreignTable: 'cards.comments', ascending: false }),
+        supabase.auth.getUser()
       ])
 
       if (boardRes.error) throw boardRes.error
       if (listsRes.error) throw listsRes.error
 
+      const boardWithOwnership = {
+        ...boardRes.data,
+        isOwner: userRes.data.user?.id === boardRes.data.owner_id
+      }
+
       const sortedLists = listsRes.data.map(list => ({
         ...list,
-        cards: list.cards?.sort((a, b) => a.position - b.position) || []
+        cards: list.cards.sort((a, b) => a.position - b.position)
+
       }))
 
-      setBoardData(boardRes.data, sortedLists)
-
+      setBoardData(boardWithOwnership, sortedLists)
     } catch (err) {
       console.error("Error:", err)
       setError(err)
@@ -65,7 +64,7 @@ export function useBoardData(boardId) {
 
   const createList = async (title) => {
     const newPosition = lists.length > 0 ? lists.length + 1 : 0
-    
+
     const { data, error } = await supabase
       .from('lists')
       .insert([{ title, board_id: boardId, position: newPosition }])
@@ -85,10 +84,10 @@ export function useBoardData(boardId) {
 
     const { data, error } = await supabase
       .from('cards')
-      .insert([{ 
-        title, 
-        list_id: listId, 
-        position: newPosition 
+      .insert([{
+        title,
+        list_id: listId,
+        position: newPosition
       }])
       .select()
 
@@ -102,14 +101,14 @@ export function useBoardData(boardId) {
   const saveCardOrder = async (listId, newCards) => {
     const updates = newCards.map((card, index) => ({
       id: card.id,
-      title: card.title,        
-      list_id: listId,          
-      position: index,         
+      title: card.title,
+      list_id: listId,
+      position: index,
     }))
 
     const { error } = await supabase
       .from('cards')
-      .upsert(updates) 
+      .upsert(updates)
 
     if (error) {
       console.error("Error guardando orden:", error)
@@ -134,12 +133,12 @@ export function useBoardData(boardId) {
 
   useEffect(() => {
     fetchAllData()
-    
-    return () => reset() 
+
+    return () => reset()
   }, [boardId])
 
 
-const updateCard = async (listId, cardId, newTitle) => {
+  const updateCard = async (listId, cardId, newTitle) => {
     updateCardInState(listId, cardId, newTitle)
 
     const { error } = await supabase
@@ -181,22 +180,22 @@ const updateCard = async (listId, cardId, newTitle) => {
   }
 
   const updateCardDescription = async (listId, cardId, description) => {
-      updateCardDescriptionInState(listId, cardId, description)
+    updateCardDescriptionInState(listId, cardId, description)
 
-      const { error } = await supabase
-        .from('cards')
-        .update({ description }) 
-        .eq('id', cardId)
+    const { error } = await supabase
+      .from('cards')
+      .update({ description })
+      .eq('id', cardId)
 
-      if (error) {
-        console.error("Error guardando descripción:", error)
-      }
+    if (error) {
+      console.error("Error guardando descripción:", error)
     }
+  }
 
-   const addComment = async (listId, cardId, text) => {
+  const addComment = async (listId, cardId, text) => {
     const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) return 
+
+    if (!user) return
 
     const newComment = {
       id: Date.now(),
@@ -207,7 +206,7 @@ const updateCard = async (listId, cardId, newTitle) => {
       created_at: new Date().toISOString()
     }
 
-    addCommentToState(listId, cardId, newComment) 
+    addCommentToState(listId, cardId, newComment)
 
     const { error } = await supabase
       .from('comments')
@@ -228,8 +227,8 @@ const updateCard = async (listId, cardId, newTitle) => {
     if (!user) return
 
     const currentList = lists.find(list => list.cards.some(c => c.id == cardId))
-    
-    if (!currentList) return 
+
+    if (!currentList) return
 
     const newActivity = {
       id: Date.now(),
@@ -237,7 +236,7 @@ const updateCard = async (listId, cardId, newTitle) => {
       user_email: user.email,
       content: text,
       created_at: new Date().toISOString(),
-      type: 'activity' 
+      type: 'activity'
     }
 
     addActivityToState(currentList.id, cardId, newActivity)
@@ -251,11 +250,40 @@ const updateCard = async (listId, cardId, newTitle) => {
     if (error) console.error("Error al registrar actividad:", error)
   }
 
-  return { 
-    board, 
-    lists, 
-    loading, 
-    error, 
+
+  const inviteUser = async (email) => {
+    const { data, error } = await supabase
+      .rpc('invite_user_to_board', {
+        email_input: email,
+        board_id_input: boardId
+      })
+
+    if (error) {
+      console.error("Error invitando:", error)
+      return { success: false, message: "Error de conexión o permisos." }
+    }
+
+    if (data === 'Usuario no encontrado') {
+      return { success: false, message: "❌ No existe un usuario registrado con ese email." }
+    }
+
+    if (data === 'El usuario ya está en el tablero') {
+      return { success: false, message: "⚠️ Ese usuario ya es miembro del tablero." }
+    }
+
+    return { success: true, message: "✅ ¡Usuario añadido correctamente!" }
+  }
+
+  const getCurrentUser = async () => {
+    const { data } = await supabase.auth.getUser()
+    return data.user
+  }
+
+  return {
+    board,
+    lists,
+    loading,
+    error,
     createList,
     createCard,
     saveCardOrder,
@@ -265,6 +293,8 @@ const updateCard = async (listId, cardId, newTitle) => {
     updateListTitle,
     updateCardDescription,
     addComment,
-    logActivity
+    logActivity,
+    inviteUser,
+    getCurrentUser
   }
 }
