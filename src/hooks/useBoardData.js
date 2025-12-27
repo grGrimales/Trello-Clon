@@ -19,7 +19,8 @@ export function useBoardData(boardId) {
     moveList,
     updateListTitleInState,
     updateCardDescriptionInState,
-    addCommentToState
+    addCommentToState,
+    addActivityToState
   } = useActiveBoardStore()
 
  const fetchAllData = async () => {
@@ -35,12 +36,13 @@ export function useBoardData(boardId) {
             *,
             cards (
               *,
-              comments (*)
+              comments (*),
+              activities (*)
             )
           `)
           .eq('board_id', boardId)
           .order('position', { ascending: true })
-          .order('created_at', { foreignTable: 'cards.comments', ascending: false })
+          .order('created_at', { foreignTable: 'cards.activities', ascending: false })
       ])
 
       if (boardRes.error) throw boardRes.error
@@ -221,6 +223,34 @@ const updateCard = async (listId, cardId, newTitle) => {
     }
   }
 
+  const logActivity = async (cardId, text) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const currentList = lists.find(list => list.cards.some(c => c.id == cardId))
+    
+    if (!currentList) return 
+
+    const newActivity = {
+      id: Date.now(),
+      card_id: cardId,
+      user_email: user.email,
+      content: text,
+      created_at: new Date().toISOString(),
+      type: 'activity' 
+    }
+
+    addActivityToState(currentList.id, cardId, newActivity)
+
+    const { error } = await supabase.from('activities').insert({
+      card_id: cardId,
+      user_email: user.email,
+      content: text
+    })
+
+    if (error) console.error("Error al registrar actividad:", error)
+  }
+
   return { 
     board, 
     lists, 
@@ -234,6 +264,7 @@ const updateCard = async (listId, cardId, newTitle) => {
     saveListOrder,
     updateListTitle,
     updateCardDescription,
-    addComment
+    addComment,
+    logActivity
   }
 }

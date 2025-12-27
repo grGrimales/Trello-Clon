@@ -39,26 +39,29 @@ export const useActiveBoardStore = create((set, get) => ({
   })),
   
   moveCard: (result) => set((state) => {
-    const { source, destination } = result;
+      const { source, destination } = result;
 
-    if (!destination) return state;
+      if (!destination) return state;
 
-    const newLists = state.lists.map(list => ({
-      ...list,
-      cards: [...list.cards] 
-    }));
-    const sourceList = newLists.find(list => list.id.toString() === source.droppableId);
-    const destList = newLists.find(list => list.id.toString() === destination.droppableId);
+      const newLists = state.lists.map(list => ({
+        ...list,
+        cards: [...list.cards] 
+      }));
 
-    if (!sourceList || !destList) return state;
+      const sourceList = newLists.find(list => list.id.toString() === source.droppableId);
+      const destList = newLists.find(list => list.id.toString() === destination.droppableId);
 
-    const [movedCard] = sourceList.cards.splice(source.index, 1);
+      if (!sourceList || !destList) return state;
 
-    destList.cards.splice(destination.index, 0, movedCard);
+      const [movedCard] = sourceList.cards.splice(source.index, 1);
 
+      const updatedCard = { ...movedCard, list_id: destList.id };
 
-    return { lists: newLists };
-  }),
+      destList.cards.splice(destination.index, 0, updatedCard);
+
+      return { lists: newLists };
+
+    }),
   
   updateCardInState: (listId, cardId, newTitle) => set((state) => ({
     lists: state.lists.map((list) => 
@@ -114,5 +117,19 @@ export const useActiveBoardStore = create((set, get) => ({
     )
   })),
 
+  addActivityToState: (listId, cardId, activity) => set((state) => ({
+    lists: state.lists.map((list) => 
+      list.id === listId 
+      ? {
+          ...list,
+          cards: list.cards.map((card) => 
+            card.id === cardId
+            ? { ...card, activities: [activity, ...(card.activities || [])] } 
+            : card
+          )
+        }
+      : list
+    )
+  })),
   
 }))

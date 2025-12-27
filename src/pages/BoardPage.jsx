@@ -27,7 +27,8 @@ export default function BoardPage() {
     saveListOrder,
     updateCardDescription,
     updateListTitle,
-    addComment
+    addComment,
+    logActivity
   } = 
     useBoardData(boardId)
 
@@ -81,6 +82,17 @@ export default function BoardPage() {
          if (sourceList) {
             await saveCardOrder(sourceList.id, sourceList.cards);
          }
+      }
+    }
+
+    if (source.droppableId !== destination.droppableId) {
+      const sourceListTitle = lists.find(l => l.id.toString() === source.droppableId)?.title
+      const destListTitle = lists.find(l => l.id.toString() === destination.droppableId)?.title
+      
+      const cardId = result.draggableId.split('-')[1] 
+      if (sourceListTitle && destListTitle) {
+         const text = `movió esta tarjeta de ${sourceListTitle} a ${destListTitle}`
+         logActivity(cardId, text)
       }
     }
   }

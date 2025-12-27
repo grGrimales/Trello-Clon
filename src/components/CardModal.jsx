@@ -40,7 +40,10 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
       {label}
     </button>
   )
-
+  const activityFeed = [
+    ...(card.comments || []).map(c => ({ ...c, type: 'comment' })),
+    ...(card.activities || []).map(a => ({ ...a, type: 'activity' }))
+  ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) 
   return (
     <div 
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-[2px] p-4"
@@ -157,34 +160,47 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
 
              {/* Placeholder de Actividad */}
              
-          <div className="space-y-6 flex-1">
+        {/* LISTA DE ACTIVIDAD MEZCLADA */}
+             <div className="space-y-6 flex-1 mt-6">
                  
-                 {/* Renderizar Comentarios Reales */}
-                 {card.comments && card.comments.map((comment, idx) => (
+                 {activityFeed.map((item, idx) => (
                     <div key={idx} className="flex gap-3 items-start animate-fadeIn">
-                        {/* Inicial del usuario */}
+                        
+                        {/* AVATAR */}
                         <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white shrink-0 mt-0.5 uppercase">
-                            {comment.user_email ? comment.user_email[0] : 'U'}
+                            {item.user_email ? item.user_email[0] : 'S'}
                         </div>
-                        <div>
+
+                        {/* CONTENIDO */}
+                        <div className="w-full">
                             <div className="flex gap-2 items-baseline">
-                                <span className="font-bold text-[#B6C2CF] text-sm">{comment.user_email?.split('@')[0]}</span>
-                                <span className="text-xs text-[#9FADBC]">{new Date(comment.created_at).toLocaleDateString()}</span>
+                                <span className="font-bold text-[#B6C2CF] text-sm">
+                                  {item.user_email?.split('@')[0]}
+                                </span>
+                                <span className="text-xs text-[#9FADBC]">
+                                  {new Date(item.created_at).toLocaleDateString()} {new Date(item.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                </span>
                             </div>
-                            <div className="bg-[#22272B] p-2 rounded-[3px] mt-1 text-sm text-[#B6C2CF] border border-gray-700/30">
-                                {comment.content}
-                            </div>
+
+                            {/* SI ES UN COMENTARIO */}
+                            {item.type === 'comment' ? (
+                                <div className="bg-[#22272B] p-3 rounded-[3px] mt-1 text-sm text-[#B6C2CF] border border-gray-700/30 shadow-sm">
+                                    {item.content}
+                                </div>
+                            ) : (
+                                <div className="text-sm text-[#B6C2CF] mt-0.5">
+                                   {item.content}
+                                </div>
+                            )}
                         </div>
                     </div>
                  ))}
 
-                 {/* Placeholder si no hay comentarios */}
-                 {(!card.comments || card.comments.length === 0) && (
-                    <p className="text-xs text-[#9FADBC] text-center italic mt-4">No hay actividad reciente.</p>
+                 {activityFeed.length === 0 && (
+                    <p className="text-xs text-[#9FADBC] text-center italic mt-4">Sin actividad reciente.</p>
                  )}
 
              </div>
-
           </div>
 
         </div>
