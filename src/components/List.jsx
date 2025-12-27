@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Droppable, Draggable } from '@hello-pangea/dnd'
 import Card from './Card' 
 
-export default function List({ list, index, createCard, deleteCard, updateCard, updateListTitle }) {
+export default function List({ list, index, createCard, deleteCard, updateCard, updateListTitle, onOpenModal }) {
   const [isEditing, setIsEditing] = useState(false)
   const [cardTitle, setCardTitle] = useState('')
 
@@ -84,6 +84,7 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
                     listId={list.id} 
                     deleteCard={deleteCard} 
                     updateCard={updateCard} 
+                    onOpenModal={onOpenModal}
                   />
                 ))}
                 {provided.placeholder}

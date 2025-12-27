@@ -17,10 +17,12 @@ export function useBoardData(boardId) {
     deleteCardFromState,
     updateCardInState,
     moveList,
-    updateListTitleInState
+    updateListTitleInState,
+    updateCardDescriptionInState,
+    addCommentToState
   } = useActiveBoardStore()
 
-  const fetchAllData = async () => {
+ const fetchAllData = async () => {
     if (!boardId) return
     setLoading(true)
 
@@ -29,9 +31,16 @@ export function useBoardData(boardId) {
         supabase.from('boards').select('*').eq('id', boardId).single(),
         supabase
           .from('lists')
-          .select('*, cards (*)')
+          .select(`
+            *,
+            cards (
+              *,
+              comments (*)
+            )
+          `)
           .eq('board_id', boardId)
           .order('position', { ascending: true })
+          .order('created_at', { foreignTable: 'cards.comments', ascending: false })
       ])
 
       if (boardRes.error) throw boardRes.error
@@ -47,6 +56,8 @@ export function useBoardData(boardId) {
     } catch (err) {
       console.error("Error:", err)
       setError(err)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -167,6 +178,48 @@ const updateCard = async (listId, cardId, newTitle) => {
     }
   }
 
+  const updateCardDescription = async (listId, cardId, description) => {
+      updateCardDescriptionInState(listId, cardId, description)
+
+      const { error } = await supabase
+        .from('cards')
+        .update({ description }) 
+        .eq('id', cardId)
+
+      if (error) {
+        console.error("Error guardando descripción:", error)
+      }
+    }
+
+   const addComment = async (listId, cardId, text) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) return 
+
+    const newComment = {
+      id: Date.now(),
+      card_id: cardId,
+      user_id: user.id,
+      user_email: user.email,
+      content: text,
+      created_at: new Date().toISOString()
+    }
+
+    addCommentToState(listId, cardId, newComment) 
+
+    const { error } = await supabase
+      .from('comments')
+      .insert({
+        card_id: cardId,
+        user_id: user.id,
+        user_email: user.email,
+        content: text
+      })
+
+    if (error) {
+      console.error("Error al comentar:", error)
+    }
+  }
 
   return { 
     board, 
@@ -180,5 +233,7 @@ const updateCard = async (listId, cardId, newTitle) => {
     updateCard,
     saveListOrder,
     updateListTitle,
+    updateCardDescription,
+    addComment
   }
 }

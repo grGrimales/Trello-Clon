@@ -88,5 +88,31 @@ export const useActiveBoardStore = create((set, get) => ({
     )
   })),
 
+  updateCardDescriptionInState: (listId, cardId, description) => set((state) => ({
+    lists: state.lists.map((list) => 
+      list.id === listId
+        ? { 
+            ...list, 
+            cards: list.cards.map(c => c.id === cardId ? { ...c, description } : c)
+          }
+        : list
+    )
+  })),
+
+  addCommentToState: (listId, cardId, comment) => set((state) => ({
+    lists: state.lists.map((list) => 
+      list.id === listId 
+      ? {
+          ...list,
+          cards: list.cards.map((card) => 
+            card.id === cardId
+            ? { ...card, comments: [comment, ...(card.comments || [])] } 
+            : card
+          )
+        }
+      : list
+    )
+  })),
+
   
 }))

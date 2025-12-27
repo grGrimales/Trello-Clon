@@ -7,6 +7,7 @@ import List from '../components/List'
 import { DragDropContext, Droppable } from '@hello-pangea/dnd' 
 import { useActiveBoardStore } from '../store/activeBoardStore'
 import { useDraggableScroll } from '../hooks/useDraggableScroll'
+import CardModal from '../components/CardModal'
 
 export default function BoardPage() {
   const { boardId } = useParams()
@@ -24,7 +25,10 @@ export default function BoardPage() {
     deleteCard,
     updateCard, 
     saveListOrder,
-    updateListTitle } = 
+    updateCardDescription,
+    updateListTitle,
+    addComment
+  } = 
     useBoardData(boardId)
 
   const moveList = useActiveBoardStore(state => state.moveList) 
@@ -34,6 +38,8 @@ export default function BoardPage() {
 
   const [isAddingList, setIsAddingList] = useState(false)
   const [newListTitle, setNewListTitle] = useState('')
+
+  const [selectedCard, setSelectedCard] = useState(null)
 
   useEffect(() => {
     if (error) navigate('/')
@@ -82,6 +88,10 @@ export default function BoardPage() {
   if (loading) return <div className="h-screen bg-[#1D2125] text-white p-10">Cargando...</div>
   if (!board) return null
 
+  const activeCard = selectedCard 
+    ? lists.find(l => l.id === selectedCard.list_id)?.cards.find(c => c.id === selectedCard.id)
+    : null
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
     <div 
@@ -124,6 +134,8 @@ export default function BoardPage() {
                     deleteCard={deleteCard}
                     updateCard={updateCard}
                     updateListTitle={updateListTitle}
+                    onOpenModal={(card) => setSelectedCard(card)}
+                    
                   />
                 ))}
                 
@@ -167,6 +179,19 @@ export default function BoardPage() {
           </Droppable>
 
         </div>
+
+        {selectedCard && activeCard && (
+        <CardModal 
+          card={activeCard}
+          listTitle={lists.find(l => l.id === selectedCard.list_id)?.title || 'Lista'}
+          onClose={() => setSelectedCard(null)}
+          onSaveDescription={async (listId, cardId, desc) => {
+             await updateCardDescription(listId, cardId, desc) 
+             setSelectedCard(null)
+          }}
+          onAddComment={(text) => addComment(selectedCard.list_id, selectedCard.id, text)}
+        />
+      )}
       </div>
     </div>
     </DragDropContext>

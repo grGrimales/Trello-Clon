@@ -26,7 +26,7 @@ const MenuButton = ({ icon: Icon, label, onClick, variant = "default" }) => (
   </button>
 )
 
-export default function Card({ card, index, listId, deleteCard, updateCard }) {
+export default function Card({ card, index, listId, deleteCard, updateCard, onOpenModal }) {
   const [isEditing, setIsEditing] = useState(false)
   const [title, setTitle] = useState(card.title)
   
@@ -101,8 +101,11 @@ export default function Card({ card, index, listId, deleteCard, updateCard }) {
 
           {/* COLUMNA DERECHA: MENÚ LATERAL */}
           <div className="flex flex-col w-40 shrink-0">
-             <MenuButton icon={CreditCard} label="Abrir tarjeta" />
-             <MenuButton icon={Tag} label="Editar etiquetas" />
+             <MenuButton icon={CreditCard} label="Abrir tarjeta" onClick={() => {
+                setIsEditing(false) 
+                onOpenModal(card)  
+              }} />
+              <MenuButton icon={Tag} label="Editar etiquetas" />
              <MenuButton icon={User} label="Cambiar miembros" />
              <MenuButton icon={Clock} label="Editar fechas" />
              <MenuButton icon={ArrowRight} label="Mover" />
