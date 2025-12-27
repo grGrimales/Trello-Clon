@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react' 
-import { useParams, useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar'
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 import { useAuth } from '../hooks/useAuth'
-import { useBoardData } from '../hooks/useBoardData'
-import List from '../components/List'
-import { DragDropContext, Droppable } from '@hello-pangea/dnd' 
-import { useActiveBoardStore } from '../store/activeBoardStore'
-import { useDraggableScroll } from '../hooks/useDraggableScroll'
-import CardModal from '../components/CardModal'
-import ShareModal from '../components/ShareModal'
+import { useBoardData } from '../hooks/useBoardData';
+import List from '../components/List';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
+import { useActiveBoardStore } from '../store/activeBoardStore';
+import { useDraggableScroll } from '../hooks/useDraggableScroll';
+import CardModal from '../components/CardModal';
+import ShareModal from '../components/ShareModal';
+import { UserPlus } from 'lucide-react';
 
 export default function BoardPage() {
   const { boardId } = useParams()
@@ -142,13 +143,13 @@ export default function BoardPage() {
             {board.title}
           </h1>
 
-         <button 
-      onClick={() => setIsShareModalOpen(true)}
-      className="bg-[#DFE1E6] hover:bg-[#C1C7D0] text-[#172B4D] text-sm font-medium px-3 py-[6px] rounded-[3px] flex items-center gap-2 transition-colors"
-    >
-       <span className="text-lg leading-none">👤+</span>
-       <span>Compartir</span>
-    </button>
+        <button 
+          onClick={() => setIsShareModalOpen(true)}
+          className="bg-[#DFE1E6] hover:bg-[#C1C7D0] text-[#172B4D] text-sm font-medium px-3 py-[6px] rounded-[3px] flex items-center gap-2 transition-colors"
+        >
+          <UserPlus size={16} /> 
+          <span>Compartir</span>
+        </button>
         </div>
 
         {/* ZONA DE SCROLL */}
