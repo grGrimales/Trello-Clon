@@ -47,6 +47,7 @@ export default function BoardPage() {
   const [selectedCard, setSelectedCard] = useState(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [isCreatingList, setIsCreatingList] = useState(false);
 
   useEffect(() => {
     if (error) navigate('/')
@@ -64,8 +65,9 @@ export default function BoardPage() {
 
   const handleSubmitList = async (e) => {
     e.preventDefault()
-    if (!newListTitle.trim()) return
+    if (!newListTitle.trim() || isCreatingList) return
 
+    setIsCreatingList(true)
     const success = await createList(newListTitle)
     if (success) {
       setNewListTitle('')
@@ -113,21 +115,24 @@ export default function BoardPage() {
     }
   }
 
-  if (loading) return <div className="h-screen bg-[#1D2125] text-white p-10">Cargando...</div>
-  if (!board) return null
+ 
 
-  const activeCard = selectedCard 
-    ? lists.find(l => l.id === selectedCard.list_id)?.cards.find(c => c.id === selectedCard.id)
-    : null
+    const activeCard = selectedCard 
+      ? lists.find(l => l.id === selectedCard.list_id)?.cards.find(c => c.id === selectedCard.id)
+      : null
 
 
     const handleShare = async () => {
       const email = window.prompt("Escribe el email del usuario a invitar al tablero:")
-      if (!email) return // Si cancela, no hacemos nada
+      if (!email) return 
 
       const result = await inviteUser(email.trim().toLowerCase())
       alert(result.message)
     }
+
+    if (loading) return <div className="h-screen bg-[#1D2125] text-white p-10">Cargando...</div>
+    if (!board) return null
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
     <div 
@@ -202,8 +207,11 @@ export default function BoardPage() {
                         onChange={(e) => setNewListTitle(e.target.value)}
                       />
                       <div className="flex items-center gap-2">
-                        <button type="submit" className="bg-blue-600 text-white text-sm px-3 py-1.5 rounded hover:bg-blue-700">
-                          Añadir lista
+                        <button 
+                          type="submit" 
+                          disabled={isCreatingList}  
+                          className="bg-blue-600 text-white text-sm px-3 py-1.5 rounded hover:bg-blue-700">
+                          {isCreatingList ? 'Creando...' : 'Añadir lista'}
                         </button>
                         <button 
                           type="button"
