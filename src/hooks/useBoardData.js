@@ -20,7 +20,8 @@ export function useBoardData(boardId) {
     updateListTitleInState,
     updateCardDescriptionInState,
     addCommentToState,
-    addActivityToState
+    addActivityToState,
+    deleteListFromState
   } = useActiveBoardStore()
 
   const fetchAllData = async () => {
@@ -279,6 +280,20 @@ export function useBoardData(boardId) {
     return data.user
   }
 
+  const deleteList = async (listId) => {
+    deleteListFromState(listId)
+
+    const { error } = await supabase
+      .from('lists')
+      .delete()
+      .eq('id', listId)
+
+    if (error) {
+      console.error("Error al eliminar la lista:", error)
+      alert("Hubo un error al eliminar la lista")
+    }
+  }
+
   return {
     board,
     lists,
@@ -295,6 +310,7 @@ export function useBoardData(boardId) {
     addComment,
     logActivity,
     inviteUser,
-    getCurrentUser
+    getCurrentUser,
+    deleteList
   }
 }

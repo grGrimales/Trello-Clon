@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { Droppable, Draggable } from '@hello-pangea/dnd'
 import Card from './Card' 
+import ListMenu from './ListMenu';
+import { MoreHorizontal } from 'lucide-react';
 
-export default function List({ list, index, createCard, deleteCard, updateCard, updateListTitle, onOpenModal }) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [cardTitle, setCardTitle] = useState('')
+export default function List({ list, index, createCard, deleteCard, updateCard, updateListTitle, onOpenModal, onDeleteList }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [cardTitle, setCardTitle] = useState('');
 
-  const [isEditingTitle, setIsEditingTitle] = useState(false)
-  const [listTitleInput, setListTitleInput] = useState(list.title)
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [listTitleInput, setListTitleInput] = useState(list.title);
+  const [showMenu, setShowMenu] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -44,7 +47,7 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
           
           <div 
             {...provided.dragHandleProps}
-            className="font-bold text-sm mb-2 px-2 flex justify-between items-center cursor-grab active:cursor-grabbing min-h-[28px]"
+            className="font-bold text-sm mb-2 px-2 flex justify-between items-center cursor-grab active:cursor-grabbing min-h-[28px] relative"
           >
             {isEditingTitle ? (
                 <input 
@@ -65,8 +68,22 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
             )}
 
             {!isEditingTitle && (
-                <span className="cursor-pointer hover:text-white shrink-0 ml-2">...</span>
+               <button 
+                onClick={() => setShowMenu(!showMenu)}
+                className="text-[#9FADBC] hover:bg-[#A6C5E2]/10 p-1 rounded transition"
+            >
+                <MoreHorizontal size={16} />
+            </button>
             )}
+            {showMenu && (
+            <ListMenu 
+                onClose={() => setShowMenu(false)} 
+                onDelete={() => {
+                    onDeleteList(list.id) 
+                    setShowMenu(false)
+                }}
+            />
+         )}
           </div>
 
           <Droppable droppableId={list.id.toString()} type="CARD">
