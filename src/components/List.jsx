@@ -75,15 +75,22 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
                 <MoreHorizontal size={16} />
             </button>
             )}
+
             {showMenu && (
-            <ListMenu 
-                onClose={() => setShowMenu(false)} 
-                onDelete={() => {
-                    onDeleteList(list.id) 
-                    setShowMenu(false)
-                }}
-            />
-         )}
+              <ListMenu 
+                  onClose={() => setShowMenu(false)} 
+                  
+                  onDelete={() => {
+                      onDeleteList(list.id) 
+                      setShowMenu(false)
+                  }}
+
+                  onAddCard={() => {
+                      setShowMenu(false) 
+                      setIsEditing(true) 
+                  }}
+              />
+            )}
           </div>
 
           <Droppable droppableId={list.id.toString()} type="CARD">
