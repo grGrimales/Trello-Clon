@@ -10,11 +10,16 @@ import { useDraggableScroll } from '../hooks/useDraggableScroll';
 import CardModal from '../components/CardModal';
 import ShareModal from '../components/ShareModal';
 import { UserPlus } from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
+import BoardMenu from '../components/BoardMenu';
+
+
 
 export default function BoardPage() {
-  const { boardId } = useParams()
-  const navigate = useNavigate()
-  const { user } = useAuth()
+  const { boardId } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const { 
     board,
@@ -34,7 +39,8 @@ export default function BoardPage() {
     inviteUser,
     getCurrentUser,
     deleteList,
-    copyList
+    copyList,
+    updateBoardBackground
   } = 
     useBoardData(boardId)
 
@@ -139,24 +145,43 @@ export default function BoardPage() {
     <DragDropContext onDragEnd={onDragEnd}>
     <div 
       className="h-screen flex flex-col"
-      style={{ backgroundColor: board.background.startsWith('#') ? board.background : undefined }} 
+      style={{ 
+                  background: board?.background || '#1D2125', 
+                  backgroundImage: board?.background?.includes('url') || board?.background?.includes('gradient') ? board?.background : undefined,
+                  backgroundColor: !board?.background?.includes('url') && !board?.background?.includes('gradient') ? board?.background : undefined
+              }}
     >
       <div className={`flex-1 flex flex-col h-full ${!board.background.startsWith('#') ? board.background : ''}`}>
         
         <Navbar user={user} />
 
         <div className="h-14 bg-black/20 backdrop-blur-sm px-4 flex items-center justify-between text-white">
+        <div className="flex items-center gap-4">
           <h1 className="font-bold text-lg px-3 py-1 rounded hover:bg-white/20 cursor-pointer transition">
             {board.title}
           </h1>
 
-        <button 
-          onClick={() => setIsShareModalOpen(true)}
-          className="bg-[#DFE1E6] hover:bg-[#C1C7D0] text-[#172B4D] text-sm font-medium px-3 py-[6px] rounded-[3px] flex items-center gap-2 transition-colors"
-        >
-          <UserPlus size={16} /> 
-          <span>Compartir</span>
-        </button>
+        </div>
+        
+      
+
+           <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setIsShareModalOpen(true)}
+              className="bg-[#DFE1E6] hover:bg-[#C1C7D0] text-[#172B4D] text-sm font-medium px-3 py-[6px] rounded-[3px] flex items-center gap-2 transition-colors"
+            >
+              <UserPlus size={16} /> 
+              <span>Compartir</span>
+            </button>
+
+                <button 
+                  onClick={() => setIsMenuOpen(true)}
+                  className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-[3px] transition"
+                >
+                   <MoreHorizontal size={16} />
+                </button>
+            </div>
+   
         </div>
 
         {/* ZONA DE SCROLL */}
@@ -249,6 +274,7 @@ export default function BoardPage() {
       )}
       </div>
 
+
       {isShareModalOpen && board && (
        <ShareModal 
           board={board}
@@ -257,6 +283,13 @@ export default function BoardPage() {
           onInvite={inviteUser}
         />
       )}
+
+      <BoardMenu 
+            isOpen={isMenuOpen}
+            onClose={() => setIsMenuOpen(false)}
+            currentBackground={board?.background}
+            onUpdateBackground={updateBoardBackground}
+        />
     </div>
     </DragDropContext>
   )

@@ -340,6 +340,20 @@ export function useBoardData(boardId) {
     addListToState(fullNewList)
   }
 
+
+  const updateBoardBackground = async (newBackground) => {
+    setBoardData({ ...board, background: newBackground }, lists)
+
+    const { error } = await supabase
+      .from('boards')
+      .update({ background: newBackground })
+      .eq('id', boardId)
+
+    if (error) {
+      console.error("Error al cambiar fondo:", error)
+    }
+  }
+
   return {
     board,
     lists,
@@ -358,6 +372,7 @@ export function useBoardData(boardId) {
     inviteUser,
     getCurrentUser,
     deleteList,
-    copyList
+    copyList,
+    updateBoardBackground
   }
 }
