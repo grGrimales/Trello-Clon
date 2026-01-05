@@ -294,6 +294,52 @@ export function useBoardData(boardId) {
     }
   }
 
+
+  const copyList = async (listId, newTitle) => {
+    const originalList = lists.find(l => l.id === listId)
+    if (!originalList) return
+
+    const newPosition = lists.length > 0 ? lists.length + 1 : 0
+
+    const { data: newListData, error: listError } = await supabase
+      .from('lists')
+      .insert({
+        board_id: boardId,
+        title: newTitle,
+        position: newPosition
+      })
+      .select()
+      .single()
+
+    if (listError) {
+      console.error("Error creando lista:", listError)
+      return
+    }
+
+    const cardsToInsert = (originalList.cards || []).map(card => ({
+      list_id: newListData.id,
+      title: card.title,
+      description: card.description,
+      position: card.position
+    }))
+
+    let insertedCards = []
+
+    if (cardsToInsert.length > 0) {
+      const { data: newCards, error: cardsError } = await supabase
+        .from('cards')
+        .insert(cardsToInsert)
+        .select()
+
+      if (!cardsError) {
+        insertedCards = newCards
+      }
+    }
+
+    const fullNewList = { ...newListData, cards: insertedCards }
+    addListToState(fullNewList)
+  }
+
   return {
     board,
     lists,
@@ -311,6 +357,7 @@ export function useBoardData(boardId) {
     logActivity,
     inviteUser,
     getCurrentUser,
-    deleteList
+    deleteList,
+    copyList
   }
 }

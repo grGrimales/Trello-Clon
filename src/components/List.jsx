@@ -4,7 +4,7 @@ import Card from './Card'
 import ListMenu from './ListMenu';
 import { MoreHorizontal } from 'lucide-react';
 
-export default function List({ list, index, createCard, deleteCard, updateCard, updateListTitle, onOpenModal, onDeleteList }) {
+export default function List({ list, index, createCard, deleteCard, updateCard, updateListTitle, onOpenModal, onDeleteList, onCopyList }) {
   const [isEditing, setIsEditing] = useState(false);
   const [cardTitle, setCardTitle] = useState('');
 
@@ -76,8 +76,9 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
             </button>
             )}
 
-            {showMenu && (
+         {showMenu && (
               <ListMenu 
+                listTitle={list.title}
                   onClose={() => setShowMenu(false)} 
                   
                   onDelete={() => {
@@ -89,16 +90,22 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
                       setShowMenu(false) 
                       setIsEditing(true) 
                   }}
+
+                  onCopyList={(newTitle) => {
+                      onCopyList(list.id, newTitle)
+                  }}
               />
             )}
           </div>
+
+             
 
           <Droppable droppableId={list.id.toString()} type="CARD">
             {(provided) => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className="space-y-2 overflow-y-auto pr-1 custom-scrollbar min-h-[10px]"
+                className="space-y-2 overflow-y-auto pr-1 custom-scrollbar min-h-[10px] relative"
               >
                 {list.cards && list.cards.map((card, index) => (
                   <Card 

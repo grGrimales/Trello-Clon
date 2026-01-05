@@ -33,7 +33,8 @@ export default function BoardPage() {
     logActivity,
     inviteUser,
     getCurrentUser,
-    deleteList
+    deleteList,
+    copyList
   } = 
     useBoardData(boardId)
 
@@ -185,6 +186,7 @@ export default function BoardPage() {
                     updateListTitle={updateListTitle}
                     onOpenModal={(card) => setSelectedCard(card)}
                     onDeleteList={deleteList}
+                    onCopyList={copyList}
                     
                   />
                 ))}
