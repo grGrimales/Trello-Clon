@@ -354,6 +354,19 @@ export function useBoardData(boardId) {
     }
   }
 
+
+  const updateListColor = async (listId, color) => {
+    const updatedLists = lists.map(l => l.id === listId ? { ...l, color } : l)
+    setBoardData(board, updatedLists)
+
+    const { error } = await supabase
+      .from('lists')
+      .update({ color })
+      .eq('id', listId)
+
+    if (error) console.error("Error updating list color:", error)
+  }
+
   return {
     board,
     lists,
@@ -373,6 +386,7 @@ export function useBoardData(boardId) {
     getCurrentUser,
     deleteList,
     copyList,
-    updateBoardBackground
+    updateBoardBackground,
+    updateListColor
   }
 }

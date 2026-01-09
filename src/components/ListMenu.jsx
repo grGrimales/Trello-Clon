@@ -1,7 +1,12 @@
 import { useState } from 'react'
 import { X, ArrowLeft } from 'lucide-react'
 
-export default function ListMenu({ listTitle, onClose, onDelete, onAddCard, onCopyList }) {
+
+const LIST_COLORS = [
+    '#216E4E', '#7F5F01', '#A54800', '#AE2E24', '#5E4DB2',
+    '#0055CC', '#206A83', '#4C6B1F', '#943D73', '#596773'
+]
+export default function ListMenu({ listTitle, onClose, onDelete, onAddCard, onCopyList, onUpdateColor }) {
   const [view, setView] = useState('main') 
   const [newTitle, setNewTitle] = useState('') 
 
@@ -57,6 +62,28 @@ const handleCopySubmit = () => {
                 <button className="w-full text-left px-4 py-1.5 hover:bg-[#333C43] cursor-pointer text-sm transition-colors">
                     Seguir
                 </button>
+
+                <div className="px-4 pt-3 pb-1">
+                    <div className="text-xs font-semibold text-[#9FADBC] mb-2">Cambiar color de lista</div>
+                    
+                    <div className="grid grid-cols-5 gap-1 mb-2">
+                        {LIST_COLORS.map((color) => (
+                            <button
+                                key={color}
+                                onClick={() => onUpdateColor(color)}
+                                className="w-full h-8 rounded-[3px] hover:brightness-110 transition border border-transparent hover:border-white/20"
+                                style={{ backgroundColor: color }}
+                            ></button>
+                        ))}
+                    </div>
+
+                    <button 
+                        onClick={() => onUpdateColor(null)} 
+                        className="w-full py-1.5 text-center text-sm hover:bg-[#333C43] rounded-[3px] transition text-[#9FADBC] hover:text-[#B6C2CF]"
+                    >
+                        ✕ Quitar color
+                    </button>
+                </div>
 
                 <div className="my-2 border-b border-gray-700/50"></div>
 

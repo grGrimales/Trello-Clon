@@ -4,7 +4,7 @@ import Card from './Card'
 import ListMenu from './ListMenu';
 import { MoreHorizontal } from 'lucide-react';
 
-export default function List({ list, index, createCard, deleteCard, updateCard, updateListTitle, onOpenModal, onDeleteList, onCopyList }) {
+export default function List({ list, index, createCard, deleteCard, updateCard, updateListTitle, onOpenModal, onDeleteList, onCopyList, updateListColor }) {
   const [isEditing, setIsEditing] = useState(false);
   const [cardTitle, setCardTitle] = useState('');
 
@@ -36,12 +36,19 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
     }
   }
 
+
+  const listStyle = list.color 
+    ? { backgroundColor: list.color } 
+    : {}
+
+
   return (
     <Draggable draggableId={`list-${list.id}`} index={index}>
       {(provided) => (
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
+          style={listStyle}
           className="w-72 shrink-0 bg-[#101204] rounded-xl p-3 text-gray-300 h-fit max-h-full flex flex-col shadow-md border border-gray-800"
         >
           
@@ -94,6 +101,7 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
                   onCopyList={(newTitle) => {
                       onCopyList(list.id, newTitle)
                   }}
+                  onUpdateColor={(color) => updateListColor(list.id, color)}
               />
             )}
           </div>

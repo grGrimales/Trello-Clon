@@ -40,7 +40,8 @@ export default function BoardPage() {
     getCurrentUser,
     deleteList,
     copyList,
-    updateBoardBackground
+    updateBoardBackground,
+    updateListColor
   } = 
     useBoardData(boardId)
 
@@ -212,6 +213,7 @@ export default function BoardPage() {
                     onOpenModal={(card) => setSelectedCard(card)}
                     onDeleteList={deleteList}
                     onCopyList={copyList}
+                    updateListColor={updateListColor}
                     
                   />
                 ))}
