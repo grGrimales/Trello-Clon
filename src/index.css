@@ -42,3 +42,31 @@ body {
     scrollbar-width: none;  /* Firefox */
   }
 }
+
+
+/* Estilos de Scrollbar tipo Trello */
+.custom-scrollbar {
+  scrollbar-width: thin; /* Para Firefox */
+  scrollbar-color: #535f6b transparent; /* Para Firefox */
+}
+
+/* Para Chrome, Edge, Safari */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; /* Ancho vertical */
+  height: 8px; /* Alto horizontal */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0; 
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #535f6b; 
+  border-radius: 4px;
+  border: 2px solid #282E33; 
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7785; 
+}

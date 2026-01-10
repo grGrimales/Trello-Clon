@@ -144,7 +144,26 @@ export default function Card({ card, index, listId, deleteCard, updateCard, onOp
           `}
           style={{ ...provided.draggableProps.style }}
         >
-          <span>{card.title}</span>
+          <div>
+    {/*  1. ETIQUETAS*/}
+          {card.labels && card.labels.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-1.5">
+                {card.labels.map(color => (
+                    <div 
+                        key={color} 
+                        className="h-2 w-10 rounded-[3px] hover:brightness-110 transition"
+                        style={{ backgroundColor: color }}
+                    />
+                ))}
+            </div>
+          )}
+
+          {/* 2. TÍTULO */}
+          <div className="text-sm text-[#B6C2CF] mb-1 break-words leading-snug">
+              {card.title}
+          </div>
+          </div>
+    
 
           <button 
             onClick={onEditClick}

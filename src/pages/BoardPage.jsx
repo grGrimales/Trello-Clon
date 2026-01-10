@@ -41,7 +41,9 @@ export default function BoardPage() {
     deleteList,
     copyList,
     updateBoardBackground,
-    updateListColor
+    updateListColor,
+    toggleCardLabel,
+    updateLabelName
   } = 
     useBoardData(boardId)
 
@@ -272,6 +274,9 @@ export default function BoardPage() {
              setSelectedCard(null)
           }}
           onAddComment={(text) => addComment(selectedCard.list_id, selectedCard.id, text)}
+          onToggleLabel={toggleCardLabel}
+          labelNames={board.label_names || {}}
+          onUpdateLabelName={updateLabelName}
         />
       )}
       </div>

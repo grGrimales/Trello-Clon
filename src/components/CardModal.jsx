@@ -1,9 +1,16 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react';
+import LabelPicker from './LabelPicker';
+import { Plus, Tag } from 'lucide-react';
+import ActionButton from './ActionButton';
 
-export default function CardModal({ card, listTitle, onClose, onSaveDescription, onAddComment }) {
-  const [description, setDescription] = useState(card.description || '')
+
+
+export default function CardModal({ card, listTitle, onClose, onSaveDescription, onAddComment, onToggleLabel,labelNames, onUpdateLabelName }) {
+  const [description, setDescription] = useState(card.description || '');
   const [isEditingDesc, setIsEditingDesc] = useState(false)
-  const textareaRef = useRef(null)
+  const textareaRef = useRef(null);
+
+  const [showLabelPicker, setShowLabelPicker] = useState(false);
 
   const [commentText, setCommentText] = useState('')
 
@@ -33,17 +40,12 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
   }
 
 
-  // Botón pequeño para la fila horizontal
-  const ActionButton = ({ icon, label }) => (
-    <button className="bg-[#3A424A] hover:bg-[#4A535C] text-[#B6C2CF] px-3 py-1.5 rounded-[3px] text-sm font-medium flex items-center gap-2 transition-colors">
-      <span className="text-gray-400">{icon}</span>
-      {label}
-    </button>
-  )
   const activityFeed = [
     ...(card.comments || []).map(c => ({ ...c, type: 'comment' })),
     ...(card.activities || []).map(a => ({ ...a, type: 'activity' }))
   ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) 
+
+
   return (
     <div 
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-[2px] p-4"
@@ -51,12 +53,12 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
     >
     
       <div 
-        className="bg-[#323940] w-full max-w-[1000px] h-[80vh] rounded-xl shadow-2xl text-[#B6C2CF] flex flex-col relative overflow-hidden border border-gray-600"
+        className="bg-[#323940] w-full max-w-[1000px] h-[80vh] shadow-2xl text-[#B6C2CF] flex flex-col relative border border-gray-600 rounded-xl"
         onMouseDown={(e) => e.stopPropagation()} 
       >
         
         {/* BARRA SUPERIOR */}
-        <div className="h-14 bg-[#323940] flex items-center justify-between px-6 border-b border-gray-700/50 shrink-0">
+        <div className="h-14 bg-[#323940] flex items-center justify-between px-6 border-b border-gray-700/50 shrink-0 border-t rounded-t-xl">
              <div className="flex items-center gap-3 text-sm text-[#9FADBC]">
                 <span className="text-lg">🗂️</span>
                 <div className="flex flex-col leading-tight">
@@ -69,7 +71,7 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
 
         {/* CONTENIDO PRINCIPAL - GRID 50/50 */}
      
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 overflow-hidden">
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 ">
           
           {/* =========================================================
               COLUMNA IZQUIERDA (Gris Base) 
@@ -78,11 +80,52 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
             
             {/* TÍTULO */}
             <h2 className="text-2xl font-bold text-[#B6C2CF] mb-6 leading-tight">{card.title}</h2>
+            {/* === SECCIÓN DE ETIQUETAS SELECCIONADAS === */}
+            {(card.labels && card.labels.length > 0) && (
+                <div className="mb-6 ml-10"> {/* ml-10 para alinear con el texto del título */}
+                    <h3 className="text-xs font-semibold text-[#9FADBC] uppercase mb-2">Etiquetas</h3>
+                    <div className="flex flex-wrap gap-1">
+                        {card.labels.map(color => (
+                            <div 
+                                key={color} 
+                                className="h-8 min-w-[48px] px-3 rounded-[3px] hover:brightness-110 cursor-pointer transition flex items-center justify-center font-bold text-[#1D2125] text-xs"
+                                style={{ backgroundColor: color }}
+                            >
+                              {labelNames ? labelNames[color] : ''}
+                            </div>
+                        ))}
+                        
+                        <button 
+                            onClick={() => setShowLabelPicker(true)}
+                            className="h-8 w-8 bg-[#3A424A] hover:bg-[#4A535C] rounded-[3px] text-[#B6C2CF] flex items-center justify-center transition"
+                        >
+                            +
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* FILA DE ACCIONES */}
             <div className="flex flex-wrap gap-2 mb-8">
-                <ActionButton icon="+" label="Añadir" />
-                <ActionButton icon="🏷️" label="Etiquetas" /> {/* Botón para abrir etiquetas */}
+                <ActionButton icon={<Plus size={16} />} label="Añadir" />
+              <div className="relative"> 
+                  
+                  <ActionButton 
+                      icon={<Tag size={16}/>} 
+                      label="Etiquetas" 
+                      onClick={() => setShowLabelPicker(!showLabelPicker)}
+                  />
+
+                  {showLabelPicker && (
+                      <LabelPicker 
+                          selectedLabels={card.labels || []}
+                          labelNames={labelNames || {}}
+                          onToggleLabel={(color) => onToggleLabel && onToggleLabel(card.list_id, card.id, color)}
+                          onUpdateLabelName={onUpdateLabelName}
+                          onClose={() => setShowLabelPicker(false)}
+                        />
+                  )}
+              </div>
                 <ActionButton icon="☑️" label="Checklist" />
                 <ActionButton icon="📎" label="Adjunto" />
             </div>
@@ -138,7 +181,7 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
               COLUMNA DERECHA (Oscuro / Negro) 
              ========================================================= */}
           {/* bg-[#1D2125] -> Color negro de Trello para actividad */}
-          <div className="bg-[#1D2125] p-6 overflow-y-auto custom-scrollbar flex flex-col border-l border-[#1D2125]">
+          <div className=" overflow-hidden bg-[#1D2125] p-6 overflow-y-auto custom-scrollbar flex flex-col border-l border-[#1D2125] border-l border-[#1D2125] rounded-br-xl" >
              
              <div className="flex items-center justify-between mb-6">
                 <h3 className="font-semibold text-[#B6C2CF] flex items-center gap-2">
@@ -161,10 +204,10 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
              {/* Placeholder de Actividad */}
              
         {/* LISTA DE ACTIVIDAD MEZCLADA */}
-             <div className="space-y-6 flex-1 mt-6">
+             <div className="space-y-6 flex-1 mt-6 overflow-hidden">
                  
                  {activityFeed.map((item, idx) => (
-                    <div key={idx} className="flex gap-3 items-start animate-fadeIn">
+                    <div key={idx} className="flex gap-3 items-start animate-fadeIn overflow-hidden">
                         
                         {/* AVATAR */}
                         <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white shrink-0 mt-0.5 uppercase">

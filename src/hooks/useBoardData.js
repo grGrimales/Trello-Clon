@@ -367,6 +367,58 @@ export function useBoardData(boardId) {
     if (error) console.error("Error updating list color:", error)
   }
 
+
+
+
+  const toggleCardLabel = async (listId, cardId, color) => {
+    const list = lists.find(l => l.id === listId)
+    const card = list?.cards?.find(c => c.id === cardId)
+
+    if (!card) return
+
+    const currentLabels = card.labels || []
+    const newLabels = currentLabels.includes(color)
+      ? currentLabels.filter(c => c !== color)
+      : [...currentLabels, color]
+
+    const updatedLists = lists.map(l => {
+      if (l.id !== listId) return l
+      return {
+        ...l,
+        cards: l.cards.map(c => {
+          if (c.id !== cardId) return c
+          return { ...c, labels: newLabels }
+        })
+      }
+    })
+
+    setBoardData({ ...board }, updatedLists)
+
+    const { error } = await supabase
+      .from('cards')
+      .update({ labels: newLabels })
+      .eq('id', cardId)
+
+    if (error) {
+      console.error("Error guardando etiquetas:", error)
+    }
+  }
+
+
+  const updateLabelName = async (color, newName) => {
+    const currentLabels = board.label_names || {}
+    const newLabelNames = { ...currentLabels, [color]: newName }
+
+    setBoardData({ ...board, label_names: newLabelNames }, lists)
+
+    const { error } = await supabase
+      .from('boards')
+      .update({ label_names: newLabelNames })
+      .eq('id', boardId)
+
+    if (error) console.error("Error actualizando nombre de etiqueta:", error)
+  }
+
   return {
     board,
     lists,
@@ -387,6 +439,8 @@ export function useBoardData(boardId) {
     deleteList,
     copyList,
     updateBoardBackground,
-    updateListColor
+    updateListColor,
+    toggleCardLabel,
+    updateLabelName
   }
 }
