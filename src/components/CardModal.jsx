@@ -71,7 +71,7 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
 
         {/* CONTENIDO PRINCIPAL - GRID 50/50 */}
      
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 ">
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-2   overflow-hidden">
           
           {/* =========================================================
               COLUMNA IZQUIERDA (Gris Base) 
@@ -203,7 +203,7 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
 
              {/* Placeholder de Actividad */}
              
-        {/* LISTA DE ACTIVIDAD MEZCLADA */}
+            {/* LISTA DE ACTIVIDAD MEZCLADA */}
              <div className="space-y-6 flex-1 mt-6 overflow-hidden">
                  
                  {activityFeed.map((item, idx) => (

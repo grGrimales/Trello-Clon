@@ -28,7 +28,6 @@ export default function LabelPicker({ selectedLabels, labelNames, onToggleLabel,
 
   return (
     <div 
-        // 👇 1. FIJAMOS LA ALTURA MÁXIMA PARA QUE NO CREZCA INFINITAMENTE
         className="absolute top-0 left-0 bg-[#282E33] w-[304px] max-h-[750px] rounded-lg shadow-xl border border-gray-700/50 z-[200] flex flex-col animate-in fade-in zoom-in-95 duration-100 text-[#B6C2CF]"
         onClick={(e) => e.stopPropagation()}
     >
@@ -163,7 +162,6 @@ export default function LabelPicker({ selectedLabels, labelNames, onToggleLabel,
 
       </div>
 
-      {/* === PIE FIJO (Solo en vista lista) === */}
       {view === 'list' && (
           <div className="p-3 pt-2 border-t border-gray-700/50 bg-[#282E33] shrink-0 rounded-b-lg">
                 <button className="w-full bg-[#333C43] hover:bg-[#3E474F] text-[#B6C2CF] py-2 rounded-[3px] text-sm font-medium transition">
