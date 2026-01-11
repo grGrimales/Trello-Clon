@@ -10,11 +10,9 @@ export default function Board() {
   const { user } = useAuth()
   const { boards, isLoading, fetchBoards, createBoard } = useBoards()
   const navigate = useNavigate()
-  // Estado local para el input de crear
   const [newBoardTitle, setNewBoardTitle] = useState('')
   const [isCreating, setIsCreating] = useState(false)
 
-  // Cargar tableros al entrar
   useEffect(() => {
     fetchBoards()
   }, [])
@@ -24,7 +22,6 @@ export default function Board() {
     if (!newBoardTitle.trim()) return
 
     setIsCreating(true)
-    // Por defecto creamos con color azul, luego haremos selector de color
     await createBoard(newBoardTitle, 'bg-blue-600') 
     setNewBoardTitle('')
     setIsCreating(false)
@@ -44,7 +41,7 @@ export default function Board() {
         {/* Grid Principal */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           
-          {/* TARJETA 1: Crear Nuevo Tablero (Siempre visible al inicio) */}
+          {/* TARJETA 1: Crear Nuevo Tablero*/}
           <div className="h-28 bg-[#22272B] rounded-lg p-3 flex flex-col justify-between transition border border-transparent hover:border-blue-500">
              <form onSubmit={handleCreateBoard} className="h-full flex flex-col justify-between">
                 <h3 className="text-sm font-medium text-gray-300">Crear tablero nuevo</h3>
@@ -80,7 +77,7 @@ export default function Board() {
                     {board.title}
                 </h3>
                 
-                {/* Indicador visual si es compartido (opcional futuro) */}
+                {/* Indicador visual si es compartido  */}
                 {board.owner_id !== user.id && (
                      <span title="Compartido contigo" className="bg-black/30 text-xs text-white px-1 rounded">👥</span>
                 )}
@@ -89,7 +86,6 @@ export default function Board() {
 
         </div>
         
-        {/* Mensaje si está cargando */}
         {isLoading && boards.length === 0 && (
             <p className="mt-8 text-center text-gray-500">Cargando tus espacios...</p>
         )}

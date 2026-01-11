@@ -74,7 +74,7 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2   overflow-hidden">
           
           {/* =========================================================
-              COLUMNA IZQUIERDA (Gris Base) 
+              COLUMNA IZQUIERDA 
              ========================================================= */}
           <div className="p-8 overflow-y-auto custom-scrollbar border-r border-gray-700/30">
             
@@ -178,9 +178,8 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
           </div>
 
           {/* =========================================================
-              COLUMNA DERECHA (Oscuro / Negro) 
+              COLUMNA DERECHA 
              ========================================================= */}
-          {/* bg-[#1D2125] -> Color negro de Trello para actividad */}
           <div className=" overflow-hidden bg-[#1D2125] p-6 overflow-y-auto custom-scrollbar flex flex-col border-l border-[#1D2125] border-l border-[#1D2125] rounded-br-xl" >
              
              <div className="flex items-center justify-between mb-6">

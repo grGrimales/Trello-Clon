@@ -145,7 +145,7 @@ export default function Card({ card, index, listId, deleteCard, updateCard, onOp
           style={{ ...provided.draggableProps.style }}
         >
           <div>
-    {/*  1. ETIQUETAS*/}
+        {/*  1. ETIQUETAS*/}
           {card.labels && card.labels.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-1.5">
                 {card.labels.map(color => (

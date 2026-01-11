@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { X, ArrowLeft, Image } from 'lucide-react'
 
-// Colores clásicos de Trello y degradados
 const BACKGROUNDS = [
   { name: 'Azul Trello', value: 'linear-gradient(to bottom right, #0079bf, #5067c5)' },
   { name: 'Naranja', value: 'linear-gradient(to bottom right, #d29034, #b04632)' },
@@ -10,11 +9,11 @@ const BACKGROUNDS = [
   { name: 'Púrpura', value: 'linear-gradient(to bottom right, #89609e, #cd5a91)' },
   { name: 'Rosa', value: 'linear-gradient(to bottom right, #cd5a91, #d29034)' },
   { name: 'Gris', value: '#838c91' },
-  { name: 'Negro', value: '#1D2125' }, // Nuestro default Dark
+  { name: 'Negro', value: '#1D2125' }, 
 ]
 
 export default function BoardMenu({ isOpen, onClose, currentBackground, onUpdateBackground }) {
-  const [view, setView] = useState('main') // 'main' | 'backgrounds'
+  const [view, setView] = useState('main') 
 
   if (!isOpen) return null
 
@@ -27,7 +26,7 @@ export default function BoardMenu({ isOpen, onClose, currentBackground, onUpdate
            <button onClick={() => setView('main')} className="hover:text-white p-1 rounded hover:bg-white/10">
              <ArrowLeft size={16} />
            </button>
-        ) : <div className="w-6"></div>} {/* Espaciador para centrar título */}
+        ) : <div className="w-6"></div>} 
 
         <h3 className="font-semibold text-sm">
             {view === 'main' ? 'Menú' : 'Cambiar fondo'}
@@ -59,7 +58,6 @@ export default function BoardMenu({ isOpen, onClose, currentBackground, onUpdate
 
              <hr className="border-gray-700/50 my-4" />
              
-             {/* Aquí irían más opciones como "Actividad", "Etiquetas", etc. */}
              <div className="text-xs text-center text-gray-500 mt-10">
                  Hecho con ❤️ en Trello Clone
              </div>
