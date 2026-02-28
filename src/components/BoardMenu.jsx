@@ -37,7 +37,6 @@ export default function BoardMenu({ isOpen, onClose, currentBackground, onUpdate
         </button>
       </div>
 
-      {/* --- CONTENIDO --- */}
       <div className="p-4 overflow-y-auto h-full">
         
         {/* VISTA PRINCIPAL */}

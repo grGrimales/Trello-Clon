@@ -7,6 +7,8 @@ import { MoreHorizontal } from 'lucide-react';
 export default function List({ list, index, createCard, deleteCard, updateCard, updateListTitle, onOpenModal, onDeleteList, onCopyList, updateListColor }) {
   const [isEditing, setIsEditing] = useState(false);
   const [cardTitle, setCardTitle] = useState('');
+  
+  const [isAddingCard, setIsAddingCard] = useState(false); 
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [listTitleInput, setListTitleInput] = useState(list.title);
@@ -14,10 +16,18 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!cardTitle.trim()) return
-    await createCard(list.id, cardTitle)
-    setCardTitle('')
-    setIsEditing(false) 
+    
+    if (!cardTitle.trim() || isAddingCard) return 
+    
+    setIsAddingCard(true) 
+    try {
+        await createCard(list.id, cardTitle)
+        setCardTitle('')
+        setIsEditing(false) 
+    } catch (error) {
+        console.error("Error al crear tarjeta:", error)
+    } finally {
+        setIsAddingCard(false) 
   }
 
   const handleTitleSubmit = () => {
@@ -36,11 +46,9 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
     }
   }
 
-
   const listStyle = list.color 
     ? { backgroundColor: list.color } 
     : {}
-
 
   return (
     <Draggable draggableId={`list-${list.id}`} index={index}>
@@ -106,8 +114,6 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
             )}
           </div>
 
-             
-
           <Droppable droppableId={list.id.toString()} type="CARD">
             {(provided) => (
               <div
@@ -142,17 +148,32 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault()
+                    // Usamos la misma función para que respete la protección
                     handleSubmit(e)
                   }
                 }}
               />
               <div className="flex items-center gap-2 mt-2">
-                <button type="submit" className="bg-blue-600 text-white text-sm px-3 py-1.5 rounded hover:bg-blue-700">Añadir</button>
-                <button type="button" onClick={() => setIsEditing(false)} className="text-gray-400 hover:text-white px-2">✕</button>
+                
+                <button 
+                    type="submit" 
+                    disabled={isAddingCard || !cardTitle.trim()}
+                    className="bg-[#579DFF] hover:bg-[#85B8FF] text-[#1D2125] text-sm font-semibold px-3 py-1.5 rounded-[3px] transition disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] flex justify-center"
+                >
+                    {isAddingCard ? '...' : 'Añadir'}
+                </button>
+                
+                <button 
+                    type="button" 
+                    onClick={() => setIsEditing(false)} 
+                    className="text-[#9FADBC] hover:text-white p-1"
+                >
+                    ✕
+                </button>
               </div>
             </form>
           ) : (
-            <button onClick={() => setIsEditing(true)} className="mt-2 text-left text-sm text-gray-400 hover:bg-[#22272B] p-2 rounded transition hover:text-white w-full flex items-center gap-1">
+            <button onClick={() => setIsEditing(true)} className="mt-2 text-left text-sm text-[#9FADBC] hover:bg-[#A6C5E2]/10 p-2 rounded transition hover:text-[#B6C2CF] w-full flex items-center gap-1">
               <span>+</span> Añadir tarjeta
             </button>
           )}

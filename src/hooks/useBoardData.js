@@ -419,6 +419,29 @@ export function useBoardData(boardId) {
     if (error) console.error("Error actualizando nombre de etiqueta:", error)
   }
 
+  const updateBoardTitle = async (newTitle) => {
+    if (!board) return
+
+    setBoardData({ ...board, title: newTitle }, lists)
+
+    const { data, error } = await supabase
+      .from('boards')
+      .update({ title: newTitle })
+      .eq('id', boardId)
+      .select()
+
+    if (error) {
+      console.error("❌ Error de Supabase al actualizar el título:", error.message)
+      alert(`Error al guardar: ${error.message}`)
+
+      setBoardData({ ...board }, lists)
+    } else {
+      console.log("✅ Título guardado en BD:", data)
+    }
+  }
+
+
+
   return {
     board,
     lists,
@@ -441,6 +464,7 @@ export function useBoardData(boardId) {
     updateBoardBackground,
     updateListColor,
     toggleCardLabel,
-    updateLabelName
+    updateLabelName,
+    updateBoardTitle
   }
 }

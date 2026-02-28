@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { supabase } from './supabaseClient'
 import { useAuthStore } from './store/authStore' 
 
-// Pages
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Board from './pages/Board'
 import BoardPage from './pages/BoardPage'
+import Loader from './components/Loader'
 
 function App() {
   const { session, loading, setSession } = useAuthStore()
@@ -24,7 +24,7 @@ function App() {
     return () => subscription.unsubscribe()
   }, [setSession]) 
 
-  if (loading) return <div className="bg-[#1D2125] min-h-screen"></div>
+ if (loading) return <Loader fullScreen text="Verificando sesión..." />
 
   return (
     <Router>

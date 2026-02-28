@@ -12,6 +12,7 @@ import ShareModal from '../components/ShareModal';
 import { UserPlus } from 'lucide-react';
 import { MoreHorizontal } from 'lucide-react';
 import BoardMenu from '../components/BoardMenu';
+import Loader from '../components/Loader';
 
 
 
@@ -43,7 +44,8 @@ export default function BoardPage() {
     updateBoardBackground,
     updateListColor,
     toggleCardLabel,
-    updateLabelName
+    updateLabelName,
+    updateBoardTitle
   } = 
     useBoardData(boardId)
 
@@ -60,6 +62,20 @@ export default function BoardPage() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isCreatingList, setIsCreatingList] = useState(false);
 
+  const [isEditingBoardTitle, setIsEditingBoardTitle] = useState(false)
+  const [boardTitleInput, setBoardTitleInput] = useState('')
+useEffect(() => {
+    if (board) setBoardTitleInput(board.title)
+  }, [board])
+
+  const handleBoardTitleSubmit = () => {
+    setIsEditingBoardTitle(false)
+    if (!boardTitleInput.trim() || boardTitleInput.trim() === board.title) {
+        setBoardTitleInput(board?.title || '')
+        return
+    }
+    updateBoardTitle(boardTitleInput.trim())
+  }
   useEffect(() => {
     if (error) navigate('/')
   }, [error, navigate])
@@ -141,7 +157,7 @@ export default function BoardPage() {
       alert(result.message)
     }
 
-    if (loading) return <div className="h-screen bg-[#1D2125] text-white p-10">Cargando...</div>
+    if (loading) return <Loader fullScreen text="Cargando..." />
     if (!board) return null
 
   return (
@@ -159,127 +175,139 @@ export default function BoardPage() {
         <Navbar user={user} />
 
         <div className="h-14 bg-black/20 backdrop-blur-sm px-4 flex items-center justify-between text-white">
-        <div className="flex items-center gap-4">
-          <h1 className="font-bold text-lg px-3 py-1 rounded hover:bg-white/20 cursor-pointer transition">
-            {board.title}
-          </h1>
-
-        </div>
-        
-      
-
-           <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setIsShareModalOpen(true)}
-              className="bg-[#DFE1E6] hover:bg-[#C1C7D0] text-[#172B4D] text-sm font-medium px-3 py-[6px] rounded-[3px] flex items-center gap-2 transition-colors"
-            >
-              <UserPlus size={16} /> 
-              <span>Compartir</span>
-            </button>
-
-                <button 
-                  onClick={() => setIsMenuOpen(true)}
-                  className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-[3px] transition"
+          {isEditingBoardTitle ? (
+                <input 
+                    autoFocus
+                    value={boardTitleInput}
+                    onChange={(e) => setBoardTitleInput(e.target.value)}
+                    onBlur={handleBoardTitleSubmit} // Guarda cuando haces clic fuera
+                    onKeyDown={(e) => e.key === 'Enter' && handleBoardTitleSubmit()} // Guarda con Enter
+                    className="bg-white text-[#1D2125] px-3 py-1 rounded-[3px] border-2 border-blue-500 outline-none font-bold text-lg h-8 w-64"
+                    style={{ margin: '-2px 0' }} // Compensar el borde para que no salte
+                />
+            ) : (
+                <h1 
+                    onClick={() => setIsEditingBoardTitle(true)}
+                    className="font-bold text-lg cursor-pointer hover:bg-white/20 px-3 py-1 rounded-[3px] transition truncate max-w-sm"
                 >
-                   <MoreHorizontal size={16} />
-                </button>
-            </div>
-   
-        </div>
-
-        {/* ZONA DE SCROLL */}
-        <div 
-          ref={scrollRef}
-          {...scrollEvents} 
-          className="flex-1 overflow-x-auto overflow-y-hidden p-4 cursor-grab select-none scrollbar-hide"
-        >
-
-          <Droppable droppableId="all-lists" direction="horizontal" type="LIST">
-            {(provided) => (
-              <div 
-                className="flex h-full gap-4"
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-              >
-                
-                {/* Listas */}
-                {lists.map((list, index) => (
-                  <List 
-                    key={list.id} 
-                    list={list}
-                    index={index} 
-                    createCard={createCard} 
-                    deleteCard={deleteCard}
-                    updateCard={updateCard}
-                    updateListTitle={updateListTitle}
-                    onOpenModal={(card) => setSelectedCard(card)}
-                    onDeleteList={deleteList}
-                    onCopyList={copyList}
-                    updateListColor={updateListColor}
-                    
-                  />
-                ))}
-                
-                {provided.placeholder}
-
-                <div className="w-72 shrink-0">
-                  {!isAddingList ? (
-                    <button 
-                      onClick={() => setIsAddingList(true)}
-                      className="w-full h-12 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold flex items-center px-4 transition text-left backdrop-blur-sm"
-                    >
-                      + Añadir otra lista
-                    </button>
-                  ) : (
-                    <form onSubmit={handleSubmitList} className="bg-[#101204] rounded-xl p-3 border border-gray-700">
-                      <input 
-                        autoFocus
-                        className="w-full bg-[#22272B] text-white text-sm p-2 rounded border border-blue-500 outline-none mb-2"
-                        placeholder="Introduzca el título..."
-                        value={newListTitle}
-                        onChange={(e) => setNewListTitle(e.target.value)}
-                      />
-                      <div className="flex items-center gap-2">
-                        <button 
-                          type="submit" 
-                          disabled={isCreatingList}  
-                          className="bg-blue-600 text-white text-sm px-3 py-1.5 rounded hover:bg-blue-700">
-                          {isCreatingList ? 'Creando...' : 'Añadir lista'}
-                        </button>
-                        <button 
-                          type="button"
-                          onClick={() => setIsAddingList(false)} 
-                          className="text-gray-400 hover:text-white px-2"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </form>
-                  )}
-                </div>
-
-              </div>
+                    {board?.title}
+                </h1>
             )}
-          </Droppable>
+            
+          
 
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setIsShareModalOpen(true)}
+                  className="bg-[#DFE1E6] hover:bg-[#C1C7D0] text-[#172B4D] text-sm font-medium px-3 py-[6px] rounded-[3px] flex items-center gap-2 transition-colors"
+                >
+                  <UserPlus size={16} /> 
+                  <span>Compartir</span>
+                </button>
+
+                    <button 
+                      onClick={() => setIsMenuOpen(true)}
+                      className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-[3px] transition"
+                    >
+                      <MoreHorizontal size={16} />
+                    </button>
+                </div>
+      
+            </div>
+
+            {/* ZONA DE SCROLL */}
+            <div 
+              ref={scrollRef}
+              {...scrollEvents} 
+              className="flex-1 overflow-x-auto overflow-y-hidden p-4 cursor-grab select-none scrollbar-hide"
+            >
+
+              <Droppable droppableId="all-lists" direction="horizontal" type="LIST">
+                {(provided) => (
+                  <div 
+                    className="flex h-full gap-4"
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                  >
+                    
+                    {/* Listas */}
+                    {lists.map((list, index) => (
+                      <List 
+                        key={list.id} 
+                        list={list}
+                        index={index} 
+                        createCard={createCard} 
+                        deleteCard={deleteCard}
+                        updateCard={updateCard}
+                        updateListTitle={updateListTitle}
+                        onOpenModal={(card) => setSelectedCard(card)}
+                        onDeleteList={deleteList}
+                        onCopyList={copyList}
+                        updateListColor={updateListColor}
+                        
+                      />
+                    ))}
+                    
+                    {provided.placeholder}
+
+                    <div className="w-72 shrink-0">
+                      {!isAddingList ? (
+                        <button 
+                          onClick={() => setIsAddingList(true)}
+                          className="w-full h-12 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold flex items-center px-4 transition text-left backdrop-blur-sm"
+                        >
+                          + Añadir otra lista
+                        </button>
+                      ) : (
+                        <form onSubmit={handleSubmitList} className="bg-[#101204] rounded-xl p-3 border border-gray-700">
+                          <input 
+                            autoFocus
+                            className="w-full bg-[#22272B] text-white text-sm p-2 rounded border border-blue-500 outline-none mb-2"
+                            placeholder="Introduzca el título..."
+                            value={newListTitle}
+                            onChange={(e) => setNewListTitle(e.target.value)}
+                          />
+                          <div className="flex items-center gap-2">
+                            <button 
+                              type="submit" 
+                              disabled={isCreatingList}  
+                              className="bg-blue-600 text-white text-sm px-3 py-1.5 rounded hover:bg-blue-700">
+                              {isCreatingList ? 'Creando...' : 'Añadir lista'}
+                            </button>
+                            <button 
+                              type="button"
+                              onClick={() => setIsAddingList(false)} 
+                              className="text-gray-400 hover:text-white px-2"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </form>
+                      )}
+                    </div>
+
+                  </div>
+                )}
+              </Droppable>
+
+            </div>
+
+            {selectedCard && activeCard && (
+            <CardModal 
+              card={activeCard}
+              listTitle={lists.find(l => l.id === selectedCard.list_id)?.title || 'Lista'}
+              onClose={() => setSelectedCard(null)}
+              onSaveDescription={async (listId, cardId, desc) => {
+                await updateCardDescription(listId, cardId, desc) 
+                setSelectedCard(null)
+              }}
+              onAddComment={(text) => addComment(selectedCard.list_id, selectedCard.id, text)}
+              onToggleLabel={toggleCardLabel}
+              labelNames={board.label_names || {}}
+              onUpdateLabelName={updateLabelName}
+            />
+          )}
         </div>
-
-        {selectedCard && activeCard && (
-        <CardModal 
-          card={activeCard}
-          listTitle={lists.find(l => l.id === selectedCard.list_id)?.title || 'Lista'}
-          onClose={() => setSelectedCard(null)}
-          onSaveDescription={async (listId, cardId, desc) => {
-             await updateCardDescription(listId, cardId, desc) 
-             setSelectedCard(null)
-          }}
-          onAddComment={(text) => addComment(selectedCard.list_id, selectedCard.id, text)}
-          onToggleLabel={toggleCardLabel}
-          labelNames={board.label_names || {}}
-          onUpdateLabelName={updateLabelName}
-        />
-      )}
-      </div>
 
 
       {isShareModalOpen && board && (
