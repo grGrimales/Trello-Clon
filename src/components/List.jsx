@@ -28,6 +28,7 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
         console.error("Error al crear tarjeta:", error)
     } finally {
         setIsAddingCard(false) 
+    }
   }
 
   const handleTitleSubmit = () => {
@@ -148,7 +149,6 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault()
-                    // Usamos la misma función para que respete la protección
                     handleSubmit(e)
                   }
                 }}
