@@ -57,7 +57,10 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          style={listStyle}
+          style={{
+            ...provided.draggableProps.style,
+            ...(list.color ? { backgroundColor: list.color } : {})
+          }}
           className="w-72 shrink-0 bg-[#101204] rounded-xl p-3 text-gray-300 h-fit max-h-full flex flex-col shadow-md border border-gray-800"
         >
           
