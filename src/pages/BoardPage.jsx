@@ -180,10 +180,10 @@ useEffect(() => {
                     autoFocus
                     value={boardTitleInput}
                     onChange={(e) => setBoardTitleInput(e.target.value)}
-                    onBlur={handleBoardTitleSubmit} // Guarda cuando haces clic fuera
-                    onKeyDown={(e) => e.key === 'Enter' && handleBoardTitleSubmit()} // Guarda con Enter
+                    onBlur={handleBoardTitleSubmit} 
+                    onKeyDown={(e) => e.key === 'Enter' && handleBoardTitleSubmit()} 
                     className="bg-white text-[#1D2125] px-3 py-1 rounded-[3px] border-2 border-blue-500 outline-none font-bold text-lg h-8 w-64"
-                    style={{ margin: '-2px 0' }} // Compensar el borde para que no salte
+                    style={{ margin: '-2px 0' }} 
                 />
             ) : (
                 <h1 
@@ -199,7 +199,7 @@ useEffect(() => {
               <div className="flex items-center gap-2">
                 <button 
                   onClick={() => setIsShareModalOpen(true)}
-                  className="bg-[#DFE1E6] hover:bg-[#C1C7D0] text-[#172B4D] text-sm font-medium px-3 py-[6px] rounded-[3px] flex items-center gap-2 transition-colors"
+                  className=" cursor-pointer bg-[#DFE1E6] hover:bg-[#C1C7D0] text-[#172B4D] text-sm font-medium px-3 py-[6px] rounded-[3px] flex items-center gap-2 transition-colors"
                 >
                   <UserPlus size={16} /> 
                   <span>Compartir</span>
@@ -254,7 +254,7 @@ useEffect(() => {
                       {!isAddingList ? (
                         <button 
                           onClick={() => setIsAddingList(true)}
-                          className="w-full h-12 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold flex items-center px-4 transition text-left backdrop-blur-sm"
+                          className="cursor-pointer w-full h-12 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold flex items-center px-4 transition text-left backdrop-blur-sm"
                         >
                           + Añadir otra lista
                         </button>
@@ -271,13 +271,13 @@ useEffect(() => {
                             <button 
                               type="submit" 
                               disabled={isCreatingList}  
-                              className="bg-blue-600 text-white text-sm px-3 py-1.5 rounded hover:bg-blue-700">
+                              className="cursor-pointer bg-blue-600 text-white text-sm px-3 py-1.5 rounded hover:bg-blue-700">
                               {isCreatingList ? 'Creando...' : 'Añadir lista'}
                             </button>
                             <button 
                               type="button"
                               onClick={() => setIsAddingList(false)} 
-                              className="text-gray-400 hover:text-white px-2"
+                              className="cursor-pointer text-gray-400 hover:text-white px-2"
                             >
                               ✕
                             </button>

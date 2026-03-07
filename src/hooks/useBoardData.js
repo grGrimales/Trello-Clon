@@ -272,9 +272,20 @@ export function useBoardData(boardId) {
       return { success: false, message: "⚠️ Ese usuario ya es miembro del tablero." }
     }
 
+    const newMember = {
+      email: email,
+      role: 'member'
+    }
+
+    if (board) {
+      setBoardData({
+        ...board,
+        members: [...(board.members || []), newMember]
+      }, lists)
+    }
+
     return { success: true, message: "✅ ¡Usuario añadido correctamente!" }
   }
-
   const getCurrentUser = async () => {
     const { data } = await supabase.auth.getUser()
     return data.user

@@ -46,7 +46,7 @@ const navigate = useNavigate()
 
         <button 
           onClick={handleLogout}
-          className="text-sm text-gray-400 hover:text-red-400 transition"
+          className="text-sm text-gray-400 hover:text-red-400 transition cursor-pointer"
         >
           Salir
         </button>

@@ -38,28 +38,28 @@ const handleCopySubmit = () => {
                 {view === 'main' ? 'Acciones de la lista' : 'Copiar lista'}
             </span>
             
-            <button onClick={onClose} className="text-[#9FADBC] hover:text-white p-1 hover:bg-white/10 rounded transition absolute right-2">
+            <button onClick={onClose} className="cursor-pointer text-[#9FADBC] hover:text-white p-1 hover:bg-white/10 rounded transition absolute right-2">
                 <X size={14} />
             </button>
         </div>
 
         {view === 'main' && (
             <div className="space-y-1">
-                <button onClick={onAddCard} className="w-full text-left px-4 py-1.5 hover:bg-[#333C43] cursor-pointer text-sm transition-colors">
+                <button onClick={onAddCard} className=" cursor-pointer w-full text-left px-4 py-1.5 hover:bg-[#333C43] text-sm transition-colors">
                     Añadir tarjeta...
                 </button>
                 
                 <button 
                     onClick={() => setView('copy')}
-                    className="w-full text-left px-4 py-1.5 hover:bg-[#333C43] cursor-pointer text-sm transition-colors"
+                    className="cursor-pointer w-full text-left px-4 py-1.5 hover:bg-[#333C43] text-sm transition-colors"
                 >
                     Copiar lista...
                 </button>
 
-                <button className="w-full text-left px-4 py-1.5 hover:bg-[#333C43] cursor-pointer text-sm transition-colors">
+                <button className="cursor-pointer w-full text-left px-4 py-1.5 hover:bg-[#333C43] text-sm transition-colors">
                     Mover lista...
                 </button>
-                <button className="w-full text-left px-4 py-1.5 hover:bg-[#333C43] cursor-pointer text-sm transition-colors">
+                <button className="cursor-pointer w-full text-left px-4 py-1.5 hover:bg-[#333C43] text-sm transition-colors">
                     Seguir
                 </button>
 
@@ -71,7 +71,7 @@ const handleCopySubmit = () => {
                             <button
                                 key={color}
                                 onClick={() => onUpdateColor(color)}
-                                className="w-full h-8 rounded-[3px] hover:brightness-110 transition border border-transparent hover:border-white/20"
+                                className="cursor-pointer w-full h-8 rounded-[3px] hover:brightness-110 transition border border-transparent hover:border-white/20"
                                 style={{ backgroundColor: color }}
                             ></button>
                         ))}
@@ -79,7 +79,7 @@ const handleCopySubmit = () => {
 
                     <button 
                         onClick={() => onUpdateColor(null)} 
-                        className="w-full py-1.5 text-center text-sm hover:bg-[#333C43] rounded-[3px] transition text-[#9FADBC] hover:text-[#B6C2CF]"
+                        className="cursor-pointer w-full py-1.5 text-center text-sm hover:bg-[#333C43] rounded-[3px] transition text-[#9FADBC] hover:text-[#B6C2CF]"
                     >
                         ✕ Quitar color
                     </button>
@@ -87,7 +87,7 @@ const handleCopySubmit = () => {
 
                 <div className="my-2 border-b border-gray-700/50"></div>
 
-                <button onClick={onDelete} className="w-full text-left px-4 py-1.5 hover:bg-[#333C43] text-sm text-[#B6C2CF] hover:text-red-400 transition-colors">
+                <button onClick={onDelete} className="cursor-pointer w-full text-left px-4 py-1.5 hover:bg-[#333C43] text-sm text-[#B6C2CF] hover:text-red-400 transition-colors">
                     Archivar esta lista
                 </button>
             </div>
@@ -106,7 +106,7 @@ const handleCopySubmit = () => {
 
                 <button 
                     onClick={handleCopySubmit}
-                    className="bg-[#579DFF] hover:bg-[#85B8FF] text-[#1D2125] font-semibold text-sm py-1.5 px-4 rounded-[3px] transition w-fit"
+                    className="cursor-pointer bg-[#579DFF] hover:bg-[#85B8FF] text-[#1D2125] font-semibold text-sm py-1.5 px-4 rounded-[3px] transition w-fit"
                 >
                     Crear lista
                 </button>

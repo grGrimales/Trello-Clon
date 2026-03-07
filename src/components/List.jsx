@@ -86,7 +86,7 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
             {!isEditingTitle && (
                <button 
                 onClick={() => setShowMenu(!showMenu)}
-                className="text-[#9FADBC] hover:bg-[#A6C5E2]/10 p-1 rounded transition"
+                className="cursor-pointer text-[#9FADBC] hover:bg-[#A6C5E2]/10 p-1 rounded transition"
             >
                 <MoreHorizontal size={16} />
             </button>
@@ -158,7 +158,7 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
                 <button 
                     type="submit" 
                     disabled={isAddingCard || !cardTitle.trim()}
-                    className="bg-[#579DFF] hover:bg-[#85B8FF] text-[#1D2125] text-sm font-semibold px-3 py-1.5 rounded-[3px] transition disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] flex justify-center"
+                    className="cursor-pointer bg-[#579DFF] hover:bg-[#85B8FF] text-[#1D2125] text-sm font-semibold px-3 py-1.5 rounded-[3px] transition disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px] flex justify-center"
                 >
                     {isAddingCard ? '...' : 'Añadir'}
                 </button>
@@ -166,14 +166,14 @@ export default function List({ list, index, createCard, deleteCard, updateCard, 
                 <button 
                     type="button" 
                     onClick={() => setIsEditing(false)} 
-                    className="text-[#9FADBC] hover:text-white p-1"
+                    className="cursor-pointer text-[#9FADBC] hover:text-white p-1"
                 >
                     ✕
                 </button>
               </div>
             </form>
           ) : (
-            <button onClick={() => setIsEditing(true)} className="mt-2 text-left text-sm text-[#9FADBC] hover:bg-[#A6C5E2]/10 p-2 rounded transition hover:text-[#B6C2CF] w-full flex items-center gap-1">
+            <button onClick={() => setIsEditing(true)} className=" cursor-pointer mt-2 text-left text-sm text-[#9FADBC] hover:bg-[#A6C5E2]/10 p-2 rounded transition hover:text-[#B6C2CF] w-full flex items-center gap-1">
               <span>+</span> Añadir tarjeta
             </button>
           )}

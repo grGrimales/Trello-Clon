@@ -18,7 +18,6 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
     setDescription(card.description || '')
   }, [card.description])
 
-  // Auto-foco al editar descripción
   useEffect(() => {
     if (isEditingDesc && textareaRef.current) {
       textareaRef.current.focus()
@@ -66,10 +65,10 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
                     <span className="font-bold text-[#B6C2CF] text-sm">{listTitle}</span>
                 </div>
              </div>
-             <button onClick={onClose} className="text-[#9FADBC] hover:text-white p-2 hover:bg-white/10 rounded-full transition">✕</button>
+             <button onClick={onClose} className="cursor-pointer text-[#9FADBC] hover:text-white p-2 hover:bg-white/10 rounded-full transition">✕</button>
         </div>
 
-        {/* CONTENIDO PRINCIPAL - GRID 50/50 */}
+        {/* CONTENIDO PRINCIPAL*/}
      
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2   overflow-hidden">
           
@@ -82,7 +81,7 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
             <h2 className="text-2xl font-bold text-[#B6C2CF] mb-6 leading-tight">{card.title}</h2>
             {/* === SECCIÓN DE ETIQUETAS SELECCIONADAS === */}
             {(card.labels && card.labels.length > 0) && (
-                <div className="mb-6 ml-10"> {/* ml-10 para alinear con el texto del título */}
+                <div className="mb-6 ml-10"> 
                     <h3 className="text-xs font-semibold text-[#9FADBC] uppercase mb-2">Etiquetas</h3>
                     <div className="flex flex-wrap gap-1">
                         {card.labels.map(color => (
@@ -97,7 +96,7 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
                         
                         <button 
                             onClick={() => setShowLabelPicker(true)}
-                            className="h-8 w-8 bg-[#3A424A] hover:bg-[#4A535C] rounded-[3px] text-[#B6C2CF] flex items-center justify-center transition"
+                            className="cursor-pointer h-8 w-8 bg-[#3A424A] hover:bg-[#4A535C] rounded-[3px] text-[#B6C2CF] flex items-center justify-center transition"
                         >
                             +
                         </button>
@@ -137,7 +136,7 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
                      <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white shrink-0 cursor-pointer shadow-sm border border-[#323940]" title="Tú">
                         YO
                      </div>
-                     <button className="w-8 h-8 rounded-full bg-[#3A424A] hover:bg-[#4A535C] text-[#9FADBC] flex items-center justify-center transition">
+                     <button className="cursor-pointer w-8 h-8 rounded-full bg-[#3A424A] hover:bg-[#4A535C] text-[#9FADBC] flex items-center justify-center transition">
                         +
                      </button>
                 </div>
@@ -161,14 +160,14 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
                       onChange={(e) => setDescription(e.target.value)}
                     />
                     <div className="flex gap-2">
-                        <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-[3px] font-medium text-sm">Guardar</button>
-                        <button onClick={() => setIsEditingDesc(false)} className="text-[#9FADBC] hover:text-white px-3 py-1.5 text-sm">Cancelar</button>
+                        <button onClick={handleSave} className=" cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-[3px] font-medium text-sm">Guardar</button>
+                        <button onClick={() => setIsEditingDesc(false)} className="cursor-pointer text-[#9FADBC] hover:text-white px-3 py-1.5 text-sm">Cancelar</button>
                     </div>
                   </div>
                ) : (
                   <div 
                     onClick={() => setIsEditingDesc(true)}
-                    className="w-full min-h-[100px] bg-[#22272B] hover:bg-[#2A3036] border border-gray-700/50 hover:border-gray-600 rounded-[4px] p-4 text-sm text-[#B6C2CF] cursor-pointer transition whitespace-pre-wrap leading-relaxed"
+                    className="cursor-pointer w-full min-h-[100px] bg-[#22272B] hover:bg-[#2A3036] border border-gray-700/50 hover:border-gray-600 rounded-[4px] p-4 text-sm text-[#B6C2CF] transition whitespace-pre-wrap leading-relaxed"
                   >
                     {description || <span className="text-[#9FADBC]">Añadir una descripción más detallada...</span>}
                   </div>
@@ -186,7 +185,7 @@ export default function CardModal({ card, listTitle, onClose, onSaveDescription,
                 <h3 className="font-semibold text-[#B6C2CF] flex items-center gap-2">
                     <span>💬</span> Comentarios y Actividad
                 </h3>
-                <button className="text-xs bg-[#3A424A] hover:bg-[#4A535C] px-2 py-1 rounded text-[#B6C2CF]">Mostrar detalles</button>
+                <button className=" cursor-pointer text-xs bg-[#3A424A] hover:bg-[#4A535C] px-2 py-1 rounded text-[#B6C2CF]">Mostrar detalles</button>
              </div>
 
              {/* Input de Comentario */}

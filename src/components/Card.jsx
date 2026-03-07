@@ -14,7 +14,7 @@ const MenuButton = ({ icon: Icon, label, onClick, variant = "default" }) => (
       onClick && onClick()
     }}
     className={`
-      flex items-center gap-2 w-full text-left px-3 py-1.5 rounded text-sm transition mb-1
+      flex items-center gap-2 w-full text-left px-3 py-1.5 rounded text-sm transition mb-1 cursor-pointer
       ${variant === "danger" 
         ? "bg-red-900/30 text-red-200 hover:bg-red-900/50" 
         : "bg-black/60 text-gray-300 hover:bg-black/80 hover:text-white hover:translate-x-1"
@@ -93,7 +93,7 @@ export default function Card({ card, index, listId, deleteCard, updateCard, onOp
             
             <button 
               onClick={handleSave}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-4 py-2 rounded shadow-md transition"
+              className=" cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-4 py-2 rounded shadow-md transition"
             >
               Guardar
             </button>
@@ -167,7 +167,7 @@ export default function Card({ card, index, listId, deleteCard, updateCard, onOp
 
           <button 
             onClick={onEditClick}
-            className="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-black/20 bg-[#22272B]"
+            className=" cursor-pointer text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-black/20 bg-[#22272B]"
           >
             <Pencil size={14} />
           </button>

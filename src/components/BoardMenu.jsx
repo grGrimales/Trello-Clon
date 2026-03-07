@@ -23,7 +23,7 @@ export default function BoardMenu({ isOpen, onClose, currentBackground, onUpdate
       {/* --- CABECERA --- */}
       <div className="flex items-center justify-between px-4 h-12 border-b border-gray-700/50">
         {view === 'backgrounds' ? (
-           <button onClick={() => setView('main')} className="hover:text-white p-1 rounded hover:bg-white/10">
+           <button onClick={() => setView('main')} className="cursor-pointer hover:text-white p-1 rounded hover:bg-white/10">
              <ArrowLeft size={16} />
            </button>
         ) : <div className="w-6"></div>} 
@@ -32,7 +32,7 @@ export default function BoardMenu({ isOpen, onClose, currentBackground, onUpdate
             {view === 'main' ? 'Menú' : 'Cambiar fondo'}
         </h3>
         
-        <button onClick={onClose} className="hover:text-white p-1 rounded hover:bg-white/10">
+        <button onClick={onClose} className="cursor-pointer hover:text-white p-1 rounded hover:bg-white/10">
           <X size={16} />
         </button>
       </div>
@@ -47,7 +47,7 @@ export default function BoardMenu({ isOpen, onClose, currentBackground, onUpdate
                 onClick={() => setView('backgrounds')}
                 className="group cursor-pointer"
              >
-                <div className="h-24 rounded-lg mb-2 relative overflow-hidden border border-gray-600 group-hover:opacity-90 transition">
+                <div className="cursor-pointer h-24 rounded-lg mb-2 relative overflow-hidden border border-gray-600 group-hover:opacity-90 transition">
                     <div className="absolute inset-0" style={{ background: currentBackground }}></div>
                     <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                         <span className="font-bold text-white drop-shadow-md">Cambiar fondo</span>
@@ -70,7 +70,7 @@ export default function BoardMenu({ isOpen, onClose, currentBackground, onUpdate
                   <button
                     key={idx}
                     onClick={() => onUpdateBackground(bg.value)}
-                    className="h-20 rounded-lg hover:brightness-110 transition relative border border-transparent hover:border-white/50"
+                    className="cursor-pointer h-20 rounded-lg hover:brightness-110 transition relative border border-transparent hover:border-white/50"
                     style={{ background: bg.value }}
                     title={bg.name}
                   >

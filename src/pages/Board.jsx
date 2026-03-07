@@ -123,7 +123,7 @@ export default function Board() {
                 {!isAddingBoard ? (
                     <button 
                         onClick={() => setIsAddingBoard(true)}
-                        className="h-[96px] bg-[#282E33] hover:bg-[#333C43] rounded-[3px] flex items-center justify-center text-sm font-medium text-[#B6C2CF] transition"
+                        className=" cursor-pointer h-[96px] bg-[#282E33] hover:bg-[#333C43] rounded-[3px] flex items-center justify-center text-sm font-medium text-[#B6C2CF] transition"
                     >
                         Crear un tablero nuevo
                     </button>
@@ -141,7 +141,7 @@ export default function Board() {
                                 <button 
                                     type="submit" 
                                     disabled={isCreating || !newBoardTitle}
-                                    className="bg-[#579DFF] hover:bg-[#85B8FF] text-[#1D2125] text-xs font-semibold px-3 py-1.5 rounded-[3px] transition disabled:opacity-50"
+                                    className=" cursor-pointer bg-[#579DFF] hover:bg-[#85B8FF] text-[#1D2125] text-xs font-semibold px-3 py-1.5 rounded-[3px] transition disabled:opacity-50"
                                 >
                                     {isCreating ? '...' : 'Crear'}
                                 </button>
@@ -151,7 +151,7 @@ export default function Board() {
                                         setIsAddingBoard(false)
                                         setNewBoardTitle('')
                                     }}
-                                    className="text-[#9FADBC] hover:text-white p-1"
+                                    className="cursor-pointer text-[#9FADBC] hover:text-white p-1"
                                 >
                                     ✕
                                 </button>

@@ -26,6 +26,26 @@ export default function ShareModal({ board, currentUser, onClose, onInvite }) {
     if (result.success) setEmail('')
   }
 
+  const allMembers = [];
+
+  allMembers.push({
+      email: board?.isOwner ? currentUser?.email : (board?.owner_email || 'Administrador Principal'),
+      role: 'Administrador',
+      isMe: board?.isOwner
+  });
+
+  if (board?.members) {
+      board.members.forEach(member => {
+          if (member.id !== board.owner_id) {
+              allMembers.push({
+                  email: member.email,
+                  role: member.role || 'Miembro',
+                  isMe: member.email === currentUser?.email
+              });
+          }
+      });
+  }
+
   return (
     <div 
       className="fixed inset-0 bg-black/60 flex items-center justify-center z-[200] animate-fadeIn"
@@ -38,7 +58,7 @@ export default function ShareModal({ board, currentUser, onClose, onInvite }) {
         
         <div className="flex items-center justify-between px-6 py-4">
             <h2 className="text-xl font-normal text-white">Compartir tablero</h2>
-            <button onClick={onClose} className="text-[#9FADBC] hover:text-white transition">
+            <button onClick={onClose} className="cursor-pointer text-[#9FADBC] hover:text-white transition">
                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
@@ -64,7 +84,7 @@ export default function ShareModal({ board, currentUser, onClose, onInvite }) {
                 <button 
                     onClick={handleInviteClick}
                     disabled={isLoading || !email}
-                    className="bg-[#579DFF] hover:bg-[#85B8FF] text-[#1D2125] px-4 py-2 rounded-[3px] text-sm font-semibold transition"
+                    className="cursor-pointer bg-[#579DFF] hover:bg-[#85B8FF] text-[#1D2125] px-4 py-2 rounded-[3px] text-sm font-semibold transition disabled:opacity-50"
                 >
                     {isLoading ? '...' : 'Compartir'}
                 </button>
@@ -86,61 +106,48 @@ export default function ShareModal({ board, currentUser, onClose, onInvite }) {
                  </div>
             </div>
 
-            {/* 3. LISTA DE MIEMBROS CON PESTAÑA AZUL */}
             <div>
                 <div className="border-b border-gray-700/50 flex mb-4">
                     <div className="border-b-2 border-[#579DFF] pb-2 pr-4 cursor-pointer">
                         <span className="text-sm font-semibold text-[#579DFF]">Miembros del tablero</span>
                         <span className="bg-[#2C333A] text-[#B6C2CF] text-xs px-1.5 py-0.5 rounded ml-2 border border-gray-700">
-                           {1 + (board.owner_id !== currentUser?.id ? 1 : 0)}
+                           {allMembers.length}
                         </span>
                     </div>
                 </div>
 
-                {/* Lista de Usuarios */}
                 <div className="space-y-4 max-h-[200px] overflow-y-auto custom-scrollbar">
                     
-                    {/* USUARIO ACTUAL  */}
-                    <div className="flex items-center justify-between group">
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-[#579DFF] flex items-center justify-center text-xs font-bold text-[#1D2125] uppercase">
-                                {getNameFromEmail(currentUser?.email)[0]}
-                                {getNameFromEmail(currentUser?.email)[1]}
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-1">
-                                    <span className="text-sm font-bold text-[#B6C2CF]">
-                                        {getNameFromEmail(currentUser?.email)}
-                                    </span>
-                                    <span className="text-sm text-[#B6C2CF] font-normal">(tú)</span>
-                                </div>
-                                <p className="text-xs text-[#9FADBC]">{getHandleFromEmail(currentUser?.email)} • Administrador del Espacio de trabajo</p>
-                            </div>
-                        </div>
-                        
-                        {/* Dropdown de Rol */}
-                        <button className="bg-[#22272B] hover:bg-[#A6C5E2]/10 px-3 py-1.5 rounded-[3px] text-sm text-[#B6C2CF] flex items-center gap-2 transition">
-                             {board.isOwner ? 'Administrador' : 'Miembro'}
-                             <span className="text-[10px]">▼</span>
-                        </button>
-                    </div>
+                    {allMembers.map((member, index) => {
+                        const isOwner = member.role === 'Administrador';
+                        const initial = member.email.includes('@') ? getNameFromEmail(member.email).substring(0, 2) : 'AD';
 
-                    {/* DUEÑO DEL TABLERO (Si no soy yo) */}
-                    {!board.isOwner && (
-                         <div className="flex items-center justify-between opacity-70">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-yellow-600 flex items-center justify-center text-xs font-bold text-white uppercase">
-                                    AD
+                        return (
+                            <div key={index} className="flex items-center justify-between group">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white uppercase ${member.isMe ? 'bg-[#579DFF] text-[#1D2125]' : (isOwner ? 'bg-yellow-600' : 'bg-gray-500')}`}>
+                                        {initial}
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-sm font-bold text-[#B6C2CF]">
+                                                {member.email.includes('@') ? getNameFromEmail(member.email) : member.email}
+                                            </span>
+                                            {member.isMe && <span className="text-sm text-[#B6C2CF] font-normal">(tú)</span>}
+                                        </div>
+                                        <p className="text-xs text-[#9FADBC]">
+                                            {member.email.includes('@') ? getHandleFromEmail(member.email) : 'Dueño original'} • {member.role}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <span className="text-sm font-bold text-[#B6C2CF]">Admin del Tablero</span>
-                                    <p className="text-xs text-[#9FADBC]">Dueño original</p>
-                                </div>
+                                
+                                <button className={`cursor-pointer px-3 py-1.5 rounded-[3px] text-sm text-[#B6C2CF] flex items-center gap-2 transition ${member.isMe ? 'bg-[#22272B] hover:bg-[#A6C5E2]/10' : 'hover:bg-[#22272B]'}`}>
+                                     {member.role}
+                                     {member.isMe && <span className="text-[10px]">▼</span>}
+                                </button>
                             </div>
-                            <span className="text-xs text-[#9FADBC] px-2">Administrador</span>
-                         </div>
-                    )}
-
+                        )
+                    })}
                 </div>
             </div>
 
