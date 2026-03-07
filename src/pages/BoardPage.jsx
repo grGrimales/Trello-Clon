@@ -64,98 +64,96 @@ export default function BoardPage() {
 
   const [isEditingBoardTitle, setIsEditingBoardTitle] = useState(false)
   const [boardTitleInput, setBoardTitleInput] = useState('')
-useEffect(() => {
-    if (board) setBoardTitleInput(board.title)
-  }, [board])
-
-  const handleBoardTitleSubmit = () => {
-    setIsEditingBoardTitle(false)
-    if (!boardTitleInput.trim() || boardTitleInput.trim() === board.title) {
-        setBoardTitleInput(board?.title || '')
-        return
-    }
-    updateBoardTitle(boardTitleInput.trim())
-  }
   useEffect(() => {
-    if (error) navigate('/')
-  }, [error, navigate])
+      if (board) setBoardTitleInput(board.title)
+    }, [board])
 
- useEffect(() => {
-    const fetchUser = async () => {
-      if (getCurrentUser) { 
-         const user = await getCurrentUser()
-         setCurrentUser(user)
+    const handleBoardTitleSubmit = () => {
+      setIsEditingBoardTitle(false)
+      if (!boardTitleInput.trim() || boardTitleInput.trim() === board.title) {
+          setBoardTitleInput(board?.title || '')
+          return
       }
+      updateBoardTitle(boardTitleInput.trim())
     }
-    fetchUser()
-  }, [getCurrentUser])
+    useEffect(() => {
+      if (error) navigate('/')
+    }, [error, navigate])
+
+  useEffect(() => {
+      const fetchUser = async () => {
+        if (getCurrentUser) { 
+          const user = await getCurrentUser()
+          setCurrentUser(user)
+        }
+      }
+      fetchUser()
+    }, [getCurrentUser])
 
   const handleSubmitList = async (e) => {
-    e.preventDefault()
-    if (!newListTitle.trim() || isCreatingList) return
+      e.preventDefault()
+      if (!newListTitle.trim() || isCreatingList) return
 
-    setIsCreatingList(true)
-    const success = await createList(newListTitle)
-    if (success) {
-      setNewListTitle('')
-      setIsAddingList(false)
-    }
-  }
-
-  const onDragEnd = async (result) => {
-    const { destination, source, type } = result; 
-
-    if (!destination) return;
-    if (destination.droppableId === source.droppableId && destination.index === source.index) return;
-
-    if (type === 'LIST') {
-      moveList(source.index, destination.index)
-      const newLists = useActiveBoardStore.getState().lists
-      await saveListOrder(newLists)
-      return; 
-    }
-
-    moveCard(result);
-    
-    const currentLists = useActiveBoardStore.getState().lists;
-    const destList = currentLists.find(l => l.id.toString() === destination.droppableId);
-    
-    if (destList) {
-      await saveCardOrder(destList.id, destList.cards);
-      if (source.droppableId !== destination.droppableId) {
-         const sourceList = currentLists.find(l => l.id.toString() === source.droppableId);
-         if (sourceList) {
-            await saveCardOrder(sourceList.id, sourceList.cards);
-         }
-      }
-    }
-
-    if (source.droppableId !== destination.droppableId) {
-      const sourceListTitle = lists.find(l => l.id.toString() === source.droppableId)?.title
-      const destListTitle = lists.find(l => l.id.toString() === destination.droppableId)?.title
+      setIsCreatingList(true) // Enciende el loading
       
-      const cardId = result.draggableId.split('-')[1] 
-      if (sourceListTitle && destListTitle) {
-         const text = `movió esta tarjeta de ${sourceListTitle} a ${destListTitle}`
-         logActivity(cardId, text)
+      try {
+          const success = await createList(newListTitle)
+          if (success) {
+            setNewListTitle('')
+            setIsAddingList(false) // Cierra el formulario
+          }
+      } finally {
+          setIsCreatingList(false) // ✅ Apaga el loading SIEMPRE (incluso si hay un error)
       }
     }
-  }
 
- 
+    const onDragEnd = async (result) => {
+      const { destination, source, type } = result; 
+
+      if (!destination) return;
+      if (destination.droppableId === source.droppableId && destination.index === source.index) return;
+
+      if (type === 'LIST') {
+        moveList(source.index, destination.index)
+        const newLists = useActiveBoardStore.getState().lists
+        await saveListOrder(newLists)
+        return; 
+      }
+
+      moveCard(result);
+      
+      const currentLists = useActiveBoardStore.getState().lists;
+      const destList = currentLists.find(l => l.id.toString() === destination.droppableId);
+      
+      if (destList) {
+        await saveCardOrder(destList.id, destList.cards);
+        if (source.droppableId !== destination.droppableId) {
+          const sourceList = currentLists.find(l => l.id.toString() === source.droppableId);
+          if (sourceList) {
+              await saveCardOrder(sourceList.id, sourceList.cards);
+          }
+        }
+      }
+
+      if (source.droppableId !== destination.droppableId) {
+        const sourceListTitle = lists.find(l => l.id.toString() === source.droppableId)?.title
+        const destListTitle = lists.find(l => l.id.toString() === destination.droppableId)?.title
+        
+        const cardId = result.draggableId.split('-')[1] 
+        if (sourceListTitle && destListTitle) {
+          const text = `movió esta tarjeta de ${sourceListTitle} a ${destListTitle}`
+          logActivity(cardId, text)
+        }
+      }
+    }
+
+  
 
     const activeCard = selectedCard 
       ? lists.find(l => l.id === selectedCard.list_id)?.cards.find(c => c.id === selectedCard.id)
       : null
 
 
-    const handleShare = async () => {
-      const email = window.prompt("Escribe el email del usuario a invitar al tablero:")
-      if (!email) return 
-
-      const result = await inviteUser(email.trim().toLowerCase())
-      alert(result.message)
-    }
 
     if (loading) return <Loader fullScreen text="Cargando..." />
     if (!board) return null

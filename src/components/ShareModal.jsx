@@ -75,10 +75,7 @@ export default function ShareModal({ board, currentUser, onClose, onInvite }) {
                         onChange={(e) => setEmail(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleInviteClick()}
                     />
-                    <div className="bg-[#22272B] border-y border-r border-[#A6C5E2]/30 px-3 flex items-center rounded-r-[3px] cursor-pointer hover:bg-[#A6C5E2]/10">
-                        <span className="text-xs font-semibold text-[#B6C2CF]">Miembro</span>
-                        <span className="text-[10px] ml-1">▼</span>
-                    </div>
+                  
                 </div>
                 
                 <button 
