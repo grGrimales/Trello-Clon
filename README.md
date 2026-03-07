@@ -1,89 +1,102 @@
+
 # 🚀 Trello Clone (React + Supabase)
 
-Un clon funcional y colaborativo de Trello, construido con **React 19**, **Tailwind CSS v4** y **Supabase**. Este proyecto replica la experiencia de usuario de Trello, incluyendo tableros, listas, tarjetas arrastrables (Drag & Drop), comentarios en tiempo real y gestión de miembros.
+A functional and collaborative Trello clone built with **React 19**, **Tailwind CSS v4**, and **Supabase**. This project replicates the Trello user experience, featuring boards, lists, drag-and-drop cards, real-time comments, and member management.
 
-![Preview](./public/preview.png)
+## ✨ Key Features
+
+### 📋 Task Management
+
+* **Dynamic Boards:** Create unlimited lists and cards.
+* **Drag & Drop (DnD):** Move cards between columns and reorder lists using `@hello-pangea/dnd`.
+* **Inline Editing:** Instantly edit list and card titles on the fly.
+
+### 📝 Card Details (Modal)
+
+* **Pixel-Perfect Design:** Trello-style modal featuring a sleek "Dark Mode".
+* **Descriptions:** Text editor for detailed task descriptions.
+* **Comments:** Real-time commenting system with timestamps and user identification.
+* **Activity History:** Automated audit log when a card is moved across lists (e.g., *"Carlos moved this card from To Do to Done"*).
+
+### 🤝 Collaboration & Security
+
+* **Email Invitations:** Built-in logic to invite registered users to collaborate on a board.
+* **Roles & Permissions:** Visual and functional distinction between `Admin` (Owner) and `Member`.
+* **Row Level Security (RLS):**
+* Strict PostgreSQL security policies.
+* Protection against infinite recursion using `SECURITY DEFINER` functions.
+* Content is strictly restricted to authorized board members.
 
 
-## ✨ Características Principales
 
-### 📋 Gestión de Tareas
-* **Tableros Dinámicos:** Creación de listas y tarjetas ilimitadas.
-* **Drag & Drop (DnD):** Mover tarjetas entre columnas y reordenar listas usando `@hello-pangea/dnd`.
-* **Edición en Sitio:** Títulos de listas y tarjetas editables.
+### ⚡ Performance (Optimistic UI)
 
-### 📝 Detalles de la Tarjeta (Modal)
-* **Diseño Pixel-Perfect:** Modal estilo Trello "Dark Mode".
-* **Descripciones:** Editor de texto para detalles de la tarea.
-* **Comentarios:** Sistema de comentarios con fecha y usuario.
-* **Historial de Actividad:** Registro automático (Audit Log) cuando una tarjeta se mueve de lista (ej: *"Carlos movió esta tarjeta de Pendientes a Finalizado"*).
+* **Global State with Zustand:** Lightweight, fast, and scalable state management.
+* **Optimistic Updates:** The UI updates instantly before confirming with the database, providing a seamless, zero-latency feel.
 
-### 🤝 Colaboración y Seguridad
-* **Invitaciones por Email:** Lógica para invitar a otros usuarios registrados al tablero.
-* **Roles:** Distinción visual entre `Administrador` (Dueño) y `Miembro`.
-* **Seguridad RLS (Row Level Security):**
-    * Políticas estrictas en PostgreSQL.
-    * Protección contra recursión infinita usando funciones `SECURITY DEFINER`.
-    * Solo los miembros del tablero pueden ver o editar el contenido.
-
-### ⚡ Rendimiento (Optimistic UI)
-* **Estado Global con Zustand:** Gestión de estado ligera y rápida.
-* **Actualizaciones Optimistas:** La interfaz se actualiza instantáneamente antes de confirmar con la base de datos (sensación de "cero latencia").
-
-## 🛠️ Stack Tecnológico
+## 🛠️ Tech Stack
 
 * **Frontend:** React 19, Vite.
-* **Estilos:** Tailwind CSS v4, Lucide React (Iconos).
-* **Estado:** Zustand.
+* **Styling:** Tailwind CSS v4, Lucide React (Icons).
+* **State Management:** Zustand.
 * **Drag & Drop:** @hello-pangea/dnd.
 * **Backend / DB:** Supabase (PostgreSQL, Auth, Realtime).
 
-## 🗄️ Estructura de Base de Datos (Supabase)
+## 🗄️ Database Structure (Supabase)
 
-El proyecto utiliza las siguientes tablas relacionales:
+The project relies on the following relational tables:
 
-1.  **`boards`**: Tableros (con `owner_id`).
-2.  **`lists`**: Listas dentro de tableros (ordenadas por `position`).
-3.  **`cards`**: Tarjetas dentro de listas.
-4.  **`comments`**: Comentarios de usuarios en tarjetas.
-5.  **`activities`**: Log de movimientos y cambios.
-6.  **`board_members`**: Tabla pivote para gestionar accesos (M:N).
+1. **`boards`**: Workspaces (includes `owner_id`).
+2. **`lists`**: Columns within boards (ordered by `position`).
+3. **`cards`**: Draggable tasks within lists.
+4. **`comments`**: User comments attached to cards.
+5. **`activities`**: Audit log for card movements and updates.
+6. **`board_members`**: Pivot table to handle access and collaboration (M:N relationship).
 
-> **Nota:** Se implementaron funciones RPC en PostgreSQL (`invite_user_to_board`, `is_board_member`) para manejar la lógica de seguridad compleja.
+> **Note:** Custom PostgreSQL RPC functions (`invite_user_to_board`, `is_board_member`) were implemented to handle complex security and invitation logic.
 
-## 🚀 Instalación y Uso
+## 🚀 Installation & Setup
 
-1.  **Clonar el repositorio:**
-    ```bash
-    git clone [https://github.com/tu-usuario/trello-clone.git](https://github.com/tu-usuario/trello-clone.git)
-    cd trello-clone
-    ```
+1. **Clone the repository:**
+```bash
+git clone https://github.com/your-username/trello-clone.git
+cd trello-clone
 
-2.  **Instalar dependencias:**
-    ```bash
-    npm install
-    ```
-
-3.  **Configurar Variables de Entorno:**
-    Crea un archivo `.env` en la raíz y agrega tus credenciales de Supabase:
-    ```env
-    VITE_SUPABASE_URL=tu_url_de_supabase
-    VITE_SUPABASE_ANON_KEY=tu_anon_key_de_supabase
-    ```
-
-4.  **Correr el proyecto:**
-    ```bash
-    npm run dev
-    ```
+```
 
 
+2. **Install dependencies:**
+```bash
+npm install
 
-## 🔮 Próximos Pasos (Roadmap)
+```
 
-* [ ] Funcionalidad de "Archivar" tarjetas.
-* [ ] Soporte para adjuntos (Subida de archivos a Supabase Storage).
-* [ ] Etiquetas de colores funcionales.
-* [ ] Checklists dentro de las tarjetas.
+
+3. **Configure Environment Variables:**
+Create a `.env` file in the root directory and add your Supabase credentials:
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+```
+
+
+4. **Run the project:**
+```bash
+npm run dev
+
+```
+
+
+
+## 🔮 Roadmap (Next Steps)
+
+* [ ] Attachment support (File uploads via Supabase Storage).
+* [ ] Checklists inside card details.
 
 ---
-Desarrollado con ❤️ por **[Grediana NAtividad Rojas Grimales]**.
+
+Developed with ❤️ by **[Grediana Natividad Rojas Grimales]**.
+
+---
+
